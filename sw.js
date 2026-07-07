@@ -1,26 +1,22 @@
-const CACHE_NAME = 'adega-erp-v1';
-const urlsToCache = [
+const CACHE_NAME = 'kr-roguelike-v1';
+const ASSETS = [
   './',
   './index.html',
   './manifest.json'
 ];
 
-// Instala o robô e guarda os arquivos básicos na memória do celular
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        return cache.addAll(urlsToCache);
-      })
+self.addEventListener('install', (e) => {
+  e.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS);
+    })
   );
 });
 
-// Intercepta as requisições para o app carregar mais rápido
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        return response || fetch(event.request);
-      })
+self.addEventListener('fetch', (e) => {
+  e.respondWith(
+    caches.match(e.request).then((response) => {
+      return response || fetch(e.request);
+    })
   );
 });
