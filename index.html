@@ -41,17 +41,18 @@
         
         /* Layout do Mapa */
         .map-node {
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .map-node.active:hover { transform: scale(1.15); box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); }
         .map-node.locked { filter: grayscale(100%) opacity(0.4); cursor: not-allowed; }
         
         .log-area { scroll-behavior: smooth; }
         
-        /* Esconde a barra de rolagem mas permite o scroll */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        /* Barra de rolagem customizada */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
     </style>
 </head>
 <body class="text-slate-100 font-sans h-screen w-screen flex flex-col justify-center items-center p-2 md:p-4">
@@ -65,35 +66,39 @@
             </button>
         </div>
 
-        <div id="telaMapa" class="hidden flex-1 flex flex-col">
-            <header class="bg-slate-800 p-4 border-b border-slate-700 flex justify-between items-center z-10 shadow-lg">
-                <h2 class="font-bold text-emerald-400 font-mono tracking-widest uppercase">Setor de Exploração</h2>
+        <div id="telaMapa" class="hidden flex-1 flex flex-col min-h-0 relative">
+            <header class="bg-slate-800 p-4 border-b border-slate-700 flex justify-between items-center z-10 shadow-lg shrink-0">
+                <h2 class="font-bold text-emerald-400 font-mono tracking-widest uppercase text-sm md:text-base">Setor de Exploração</h2>
                 <div class="text-yellow-400 font-mono text-sm font-bold bg-slate-900 px-3 py-1 rounded border border-slate-700">🪙 Moedas Rider: <span id="hudMoedas">0</span></div>
             </header>
             
             <div class="flex-1 overflow-y-auto flex flex-col-reverse justify-start items-center p-8 gap-12 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGRpdiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojMGYxNzJhO2hlaWdodDoxMDAlO3dpZHRoOjEwMCU7Ij48L2Rpdj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxIiBmaWxsPSIjMzM0MTU1Ii8+PC9zdmc+')] bg-repeat" id="mapContainer">
                 </div>
+            
+            <div class="absolute bottom-4 left-0 w-full text-center pointer-events-none text-slate-500 font-mono text-xs uppercase tracking-widest opacity-50 font-bold">
+                ↓ Ponto de Partida ↓
+            </div>
         </div>
 
-        <div id="telaRecompensa" class="hidden flex-1 flex flex-col items-center justify-center p-6 bg-slate-900/95 z-20 absolute inset-0">
-            <h2 class="text-3xl font-black text-yellow-400 mb-2 uppercase">Batalha Concluída!</h2>
-            <p class="text-emerald-400 mb-8 font-mono">> Escolha sua recompensa da base de dados:</p>
+        <div id="telaRecompensa" class="hidden flex-1 flex flex-col items-center justify-center p-4 md:p-6 bg-slate-900/95 z-20 absolute inset-0">
+            <h2 class="text-2xl md:text-3xl font-black text-yellow-400 mb-2 uppercase text-center">Batalha Concluída!</h2>
+            <p class="text-emerald-400 mb-8 font-mono text-sm md:text-base text-center">> Escolha sua recompensa da base de dados:</p>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-3xl mb-8">
-                <button onclick="coletarRecompensa('ataque')" class="ff-menu p-6 hover:border-emerald-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
+                <button onclick="coletarRecompensa('ataque')" class="ff-menu p-4 md:p-6 hover:border-emerald-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
                     <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">⚔️</div>
-                    <h3 class="font-bold text-white mb-2">Novo Ataque</h3>
-                    <p class="text-xs text-slate-400">Adiciona um golpe à Forma Base.</p>
+                    <h3 class="font-bold text-white mb-2 text-sm md:text-base">Novo Ataque</h3>
+                    <p class="text-[10px] md:text-xs text-slate-400">Adiciona um golpe à Forma Base.</p>
                 </button>
-                <button onclick="coletarRecompensa('maxhp')" class="ff-menu p-6 hover:border-blue-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
+                <button onclick="coletarRecompensa('maxhp')" class="ff-menu p-4 md:p-6 hover:border-blue-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
                     <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">❤️</div>
-                    <h3 class="font-bold text-white mb-2">Aprimoramento Core</h3>
-                    <p class="text-xs text-slate-400">Aumenta Vida Máxima em +15.</p>
+                    <h3 class="font-bold text-white mb-2 text-sm md:text-base">Aprimoramento Core</h3>
+                    <p class="text-[10px] md:text-xs text-slate-400">Aumenta Vida Máxima em +15.</p>
                 </button>
-                <button onclick="coletarRecompensa('item')" class="ff-menu p-6 hover:border-yellow-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
+                <button onclick="coletarRecompensa('item')" class="ff-menu p-4 md:p-6 hover:border-yellow-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
                     <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">💊</div>
-                    <h3 class="font-bold text-white mb-2">Suprimentos</h3>
-                    <p class="text-xs text-slate-400">Ganha 1 Item Consumível aleatório.</p>
+                    <h3 class="font-bold text-white mb-2 text-sm md:text-base">Suprimentos</h3>
+                    <p class="text-[10px] md:text-xs text-slate-400">Ganha 1 Item Consumível aleatório.</p>
                 </button>
             </div>
             
@@ -103,55 +108,54 @@
         </div>
 
         <div id="telaBatalha" class="hidden flex-1 flex flex-col gap-2 p-2">
-            
-            <header class="bg-slate-800 border border-slate-700 p-3 rounded flex justify-between items-end shadow-lg">
+            <header class="bg-slate-800 border border-slate-700 p-3 rounded flex justify-between items-end shadow-lg shrink-0">
                 <div class="flex-1">
-                    <h2 class="font-bold text-lg text-white tracking-wide" id="hudRiderName">Kuuga</h2>
-                    <div class="flex gap-4 mt-1">
-                        <div class="w-32">
+                    <h2 class="font-bold text-sm md:text-lg text-white tracking-wide truncate" id="hudRiderName">Kuuga</h2>
+                    <div class="flex gap-2 md:gap-4 mt-1">
+                        <div class="w-24 md:w-32">
                             <div class="flex justify-between text-[10px] uppercase font-bold text-red-400"><span>HP</span> <span id="hudHp">100/100</span></div>
                             <div class="w-full bg-slate-900 h-2 rounded"><div id="barHp" class="bg-red-500 h-2 rounded transition-all duration-300"></div></div>
                         </div>
-                        <div class="w-32">
-                            <div class="flex justify-between text-[10px] uppercase font-bold text-cyan-400"><span>Energia</span> <span id="hudSp">10/10</span></div>
+                        <div class="w-24 md:w-32">
+                            <div class="flex justify-between text-[10px] uppercase font-bold text-cyan-400"><span>EN</span> <span id="hudSp">10/10</span></div>
                             <div class="w-full bg-slate-900 h-2 rounded"><div id="barSp" class="bg-cyan-500 h-2 rounded transition-all duration-300"></div></div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="text-right">
-                    <h2 class="font-bold text-lg text-purple-400 tracking-wide" id="hudEnemyName">Inimigo</h2>
-                    <div class="w-32 ml-auto mt-1">
+                <div class="text-right flex-1 flex flex-col items-end">
+                    <h2 class="font-bold text-sm md:text-lg text-purple-400 tracking-wide truncate max-w-full" id="hudEnemyName">Inimigo</h2>
+                    <div class="w-24 md:w-32 mt-1">
                         <div class="flex justify-between text-[10px] uppercase font-bold text-purple-300"><span>HP</span> <span id="hudEnemyHp">80/80</span></div>
                         <div class="w-full bg-slate-900 h-2 rounded"><div id="barEnemyHp" class="bg-purple-500 h-2 rounded transition-all duration-300"></div></div>
                     </div>
                 </div>
             </header>
 
-            <div class="flex-1 bg-slate-900 border border-slate-700 rounded relative flex flex-col p-4 overflow-hidden">
+            <div class="flex-1 bg-slate-900 border border-slate-700 rounded relative flex flex-col p-4 overflow-hidden min-h-[150px]">
                 <div class="absolute top-2 left-2 bg-slate-800 px-2 py-1 rounded text-xs font-mono text-slate-400 border border-slate-700 shadow">Andar: <span id="hudAndar" class="text-white font-bold">1</span> | Turno: <span id="turnCounter" class="text-white font-bold">1</span></div>
                 
-                <div class="flex-1 flex justify-between items-center px-10 text-6xl">
+                <div class="flex-1 flex justify-between items-center px-4 md:px-10 text-5xl md:text-6xl">
                     <div id="spriteRider" class="transform transition-transform">🏍️</div>
                     <div id="spriteEnemy" class="transform animate-pulse">🦇</div>
                 </div>
 
-                <div id="battleLog" class="h-24 w-full bg-slate-800/80 border border-slate-700 rounded p-2 overflow-y-auto log-area font-mono text-xs mt-4 shadow-inner">
+                <div id="battleLog" class="h-20 md:h-24 w-full bg-slate-800/80 border border-slate-700 rounded p-2 overflow-y-auto log-area font-mono text-[10px] md:text-xs mt-4 shadow-inner shrink-0">
                     <p class="text-emerald-400">> Batalha Iniciada!</p>
                 </div>
             </div>
 
-            <div class="h-56 flex gap-2">
+            <div class="h-48 md:h-56 flex gap-2 shrink-0">
                 <div class="w-1/3 ff-menu p-2 flex flex-col overflow-y-auto">
                     <button onclick="mudarAba('ataques')" id="tab-ataques" class="ff-btn active shrink-0">Atacar</button>
-                    <button onclick="mudarAba('habilidades')" id="tab-habilidades" class="ff-btn shrink-0">Habilidades</button>
+                    <button onclick="mudarAba('habilidades')" id="tab-habilidades" class="ff-btn shrink-0">Hab.</button>
                     <button onclick="mudarAba('itens')" id="tab-itens" class="ff-btn flex justify-between shrink-0">
                         <span>Itens</span> <span id="itemStatus" class="text-[10px] text-emerald-400 pt-1">1/1</span>
                     </button>
-                    <button onclick="mudarAba('formas')" id="tab-formas" class="ff-btn shrink-0">Transformar</button>
+                    <button onclick="mudarAba('formas')" id="tab-formas" class="ff-btn shrink-0">Transf.</button>
                     
                     <div class="mt-auto pt-2 border-t border-slate-700 shrink-0">
-                        <button onclick="passarTurno()" class="ff-btn !text-yellow-400 hover:!border-yellow-400">Passar Turno</button>
+                        <button onclick="passarTurno()" class="ff-btn !text-yellow-400 hover:!border-yellow-400 truncate">Passar Turno</button>
                     </div>
                 </div>
                 <div class="w-2/3 ff-menu p-2 overflow-y-auto" id="menuAcoes"></div>
@@ -170,12 +174,12 @@
                     growing: {
                         id: 'growing', name: 'Growing Form', sprite: '⚪',
                         ataques: [ { nome: 'Soco Fraco', custo: 2, dano: 5 }, { nome: 'Chute', custo: 4, dano: 12 } ],
-                        habilidades: [ { nome: 'Foco (Recupera SP)', custo: 0, efeito: 'recuperar_sp', valor: 3 } ]
+                        habilidades: [ { nome: 'Foco (+SP)', custo: 0, efeito: 'recuperar_sp', valor: 3 } ]
                     },
                     mighty: {
                         id: 'mighty', name: 'Mighty Form', sprite: '🔴',
                         ataques: [ { nome: 'Mighty Punch', custo: 3, dano: 15 }, { nome: 'Mighty Kick', custo: 8, dano: 35 } ],
-                        habilidades: [ { nome: 'Pose (Buff Atk)', custo: 3, efeito: 'buff_atk', valor: 1.5 } ]
+                        habilidades: [ { nome: 'Pose (Buff)', custo: 3, efeito: 'buff_atk', valor: 1.5 } ]
                     }
                 }
             }
@@ -183,22 +187,16 @@
 
         const DB_ITENS = [ { nome: 'Poção de Vida', custo: 2, efeito: 'cura', valor: 30 } ];
 
-        // ================= ESTADO GLOBAL DA RUN =================
+        // ================= ESTADO GLOBAL =================
         let runState = {
-            andarAtual: 0, // Vai de 0 a 9 (10 andares)
+            andarAtual: 0, 
             mapa: [],
             moedas: 0,
-            rider: {
-                id: 'kuuga',
-                formaAtual: 'growing',
-                hp: 100, maxHp: 100, sp: 10, maxSp: 10, buffAtk: 1
-            }
+            rider: { id: 'kuuga', formaAtual: 'growing', hp: 100, maxHp: 100, sp: 10, maxSp: 10, buffAtk: 1 }
         };
 
         let battleState = {
-            ativa: false, // FIX 2: Trava do combate
-            turno: 1, itemUsado: false, abaAtual: 'ataques',
-            enemy: null
+            ativa: false, turno: 1, itemUsado: false, abaAtual: 'ataques', enemy: null
         };
 
         const menusDOM = {
@@ -213,14 +211,11 @@
             menusDOM[tela].classList.remove('hidden');
         }
 
-        // ================= SISTEMA DE MAPA =================
+        // ================= MAPA =================
         function iniciarRun() {
-            runState.moedas = 0;
-            runState.andarAtual = 0;
-            runState.rider.hp = DB_RIDERS.kuuga.baseHp;
-            runState.rider.maxHp = DB_RIDERS.kuuga.baseHp;
-            gerarMapaAleatorio();
-            renderizarMapa();
+            runState.moedas = 0; runState.andarAtual = 0;
+            runState.rider.hp = DB_RIDERS.kuuga.baseHp; runState.rider.maxHp = DB_RIDERS.kuuga.baseHp;
+            gerarMapaAleatorio(); renderizarMapa();
             mostrarTela('mapa');
         }
 
@@ -228,13 +223,10 @@
             runState.mapa = [];
             for (let i = 0; i < 10; i++) {
                 let opcoesNoAndar = [];
-                // Primeiro e último andar sempre tem 1 opção (Entrada e Chefe)
                 let numOpcoes = (i === 0 || i === 9) ? 1 : Math.floor(Math.random() * 3) + 1; 
                 
                 for(let j = 0; j < numOpcoes; j++) {
-                    let tipo = 'batalha';
-                    let icone = '⚔️'; let cor = 'bg-red-900/80 border-red-500 text-red-100';
-                    
+                    let tipo = 'batalha'; let icone = '⚔️'; let cor = 'bg-red-900/80 border-red-500 text-red-100';
                     if (i === 9) { tipo = 'chefe'; icone = '☠️'; cor = 'bg-purple-900/90 border-purple-500 scale-125'; }
                     else if (i > 0 && i < 9) {
                         let r = Math.random();
@@ -255,15 +247,14 @@
 
             runState.mapa.forEach((andar, index) => {
                 const rowDiv = document.createElement('div');
-                rowDiv.className = 'flex gap-8 justify-center w-full relative';
+                rowDiv.className = 'flex gap-8 justify-center w-full relative mb-4';
                 
                 const isAtivo = index === runState.andarAtual;
                 const isPassado = index < runState.andarAtual;
 
                 andar.forEach(no => {
                     const btn = document.createElement('button');
-                    // Classes de estilo e estado (bloqueado, ativo, passado)
-                    btn.className = `map-node flex items-center justify-center w-16 h-16 rounded-full border-4 text-2xl shadow-lg ${no.cor} `;
+                    btn.className = `map-node flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full border-4 text-xl md:text-2xl shadow-lg ${no.cor} `;
                     btn.innerHTML = no.icone;
                     
                     if (isAtivo) {
@@ -279,12 +270,21 @@
                 });
                 container.appendChild(rowDiv);
             });
+
+            // FIX DA CÂMERA: Foca automaticamente no nó atual
+            setTimeout(() => {
+                const activeNode = container.querySelector('.map-node.active');
+                if(activeNode) {
+                    activeNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    container.scrollTop = container.scrollHeight;
+                }
+            }, 100); // Pequeno atraso para garantir que o DOM renderizou
         }
 
         function entrarNoMapa(tipo) {
             if (tipo === 'batalha' || tipo === 'chefe') {
-                prepararCombate(tipo);
-                mostrarTela('batalha');
+                prepararCombate(tipo); mostrarTela('batalha');
             } else if (tipo === 'descanso') {
                 alert("Casa de Descanso! Recuperou 30 HP.");
                 runState.rider.hp = Math.min(runState.rider.maxHp, runState.rider.hp + 30);
@@ -301,18 +301,14 @@
                 alert("FIM DE JOGO! VOCÊ VENCEU A RUN!");
                 mostrarTela('boot');
             } else {
-                renderizarMapa();
-                mostrarTela('mapa');
+                renderizarMapa(); mostrarTela('mapa');
             }
         }
 
-        // ================= SISTEMA DE COMBATE (FIXADO) =================
+        // ================= COMBATE =================
         function prepararCombate(tipo) {
-            battleState.ativa = true; // Libera os botões
-            battleState.turno = 1;
-            battleState.itemUsado = false;
-            runState.rider.formaAtual = 'growing'; // Reseta a forma
-            runState.rider.sp = runState.rider.maxSp;
+            battleState.ativa = true; battleState.turno = 1; battleState.itemUsado = false;
+            runState.rider.formaAtual = 'growing'; runState.rider.sp = runState.rider.maxSp;
             
             battleState.enemy = { 
                 name: tipo === 'chefe' ? 'Boss Grongi' : 'Grongi Aleatório', 
@@ -326,7 +322,6 @@
             atualizarHUD(); mudarAba('ataques');
         }
 
-        // FIX 2: Adicionado validação "if(!battleState.ativa) return;" em todas as ações
         function log(msg, cor = 'text-slate-300') {
             const p = document.createElement('p'); p.className = `mb-1 ${cor}`; p.innerText = `> ${msg}`;
             const bl = document.getElementById('battleLog'); bl.appendChild(p); bl.scrollTop = bl.scrollHeight;
@@ -354,15 +349,13 @@
             document.querySelectorAll('.ff-menu .ff-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`tab-${novaAba}`).classList.add('active');
 
-            const menuAcoes = document.getElementById('menuAcoes');
-            menuAcoes.innerHTML = '';
+            const menuAcoes = document.getElementById('menuAcoes'); menuAcoes.innerHTML = '';
             
-            // Se a batalha acabou, exibe botão de continuar e ignora o resto
             if (!battleState.ativa) {
                 if(runState.rider.hp > 0) {
-                    menuAcoes.innerHTML = `<button onclick="vencerCombate()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest animate-bounce mt-4">Coletar Recompensa</button>`;
+                    menuAcoes.innerHTML = `<button onclick="vencerCombate()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest animate-bounce mt-4 text-sm md:text-base">Coletar Recompensa</button>`;
                 } else {
-                    menuAcoes.innerHTML = `<button onclick="mostrarTela('boot')" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Fim de Jogo</button>`;
+                    menuAcoes.innerHTML = `<button onclick="mostrarTela('boot')" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4 text-sm md:text-base">Fim de Jogo</button>`;
                 }
                 return;
             }
@@ -376,16 +369,15 @@
         }
 
         function criarSlotAcao(nome, custo, cb) {
-            const btn = document.createElement('button'); btn.className = 'ff-btn flex justify-between mb-1 shrink-0';
+            const btn = document.createElement('button'); btn.className = 'ff-btn flex justify-between items-center mb-1 shrink-0';
             if (runState.rider.sp < custo) btn.disabled = true;
-            btn.innerHTML = `<span>${nome}</span> <span class="text-cyan-500 font-bold">${custo > 0 ? custo+' SP' : 'Livre'}</span>`;
+            btn.innerHTML = `<span class="truncate pr-2">${nome}</span> <span class="text-cyan-500 font-bold shrink-0">${custo > 0 ? custo+' SP' : 'Livre'}</span>`;
             btn.onclick = cb; document.getElementById('menuAcoes').appendChild(btn); return btn;
         }
 
         function usarAtaque(atk) {
             if (!battleState.ativa || runState.rider.sp < atk.custo) return;
-            runState.rider.sp -= atk.custo;
-            const d = Math.floor(atk.dano * runState.rider.buffAtk);
+            runState.rider.sp -= atk.custo; const d = Math.floor(atk.dano * runState.rider.buffAtk);
             battleState.enemy.hp -= d; runState.rider.buffAtk = 1;
             log(`Usou [${atk.nome}] causando ${d} de dano!`); verificarFim();
         }
@@ -414,8 +406,7 @@
 
         function passarTurno() {
             if (!battleState.ativa) return;
-            log('Fim do seu turno.', 'text-slate-500');
-            battleState.ativa = false; // Trava inputs do jogador
+            log('Fim do seu turno.', 'text-slate-500'); battleState.ativa = false;
             
             setTimeout(() => {
                 if(battleState.enemy.hp > 0) {
@@ -423,10 +414,10 @@
                     runState.rider.hp -= d; log(`Inimigo atacou e causou ${d} dano!`, 'text-red-400');
                 }
                 setTimeout(() => {
-                    verificarFim(); // Verifica se o rider morreu no ataque
+                    verificarFim(); 
                     if(battleState.enemy.hp > 0 && runState.rider.hp > 0) {
                         battleState.turno++; runState.rider.sp = runState.rider.maxSp; battleState.itemUsado = false;
-                        battleState.ativa = true; // Libera inputs do jogador
+                        battleState.ativa = true; 
                         log(`-- Início do Turno ${battleState.turno} --`, 'text-emerald-500 mt-2');
                         atualizarHUD(); mudarAba(battleState.abaAtual);
                     }
@@ -437,17 +428,13 @@
         function verificarFim() {
             atualizarHUD(); mudarAba(battleState.abaAtual);
             if (battleState.enemy.hp <= 0) {
-                battleState.ativa = false;
-                log('VITÓRIA!', 'text-yellow-400 font-bold text-lg');
-                mudarAba('ataques'); // Força a renderização do botão de continuar
+                battleState.ativa = false; log('VITÓRIA!', 'text-yellow-400 font-bold text-lg'); mudarAba('ataques'); 
             } else if (runState.rider.hp <= 0) {
-                battleState.ativa = false;
-                log('GAME OVER.', 'text-red-500 font-bold text-lg');
-                mudarAba('ataques');
+                battleState.ativa = false; log('GAME OVER.', 'text-red-500 font-bold text-lg'); mudarAba('ataques');
             }
         }
 
-        // ================= SISTEMA DE RECOMPENSA =================
+        // ================= RECOMPENSA =================
         function vencerCombate() {
             const moedasGanhas = 15 + Math.floor(Math.random() * 10);
             runState.moedas += moedasGanhas;
@@ -456,15 +443,9 @@
         }
 
         function coletarRecompensa(tipo) {
-            if(tipo === 'maxhp') {
-                runState.rider.maxHp += 15;
-                runState.rider.hp += 15;
-                alert("HP Máximo aumentado!");
-            } else if (tipo === 'ataque') {
-                alert("Nesta versão mock, você aprendeu um golpe! (Lógica de inventário em breve)");
-            } else {
-                alert("Você ganhou 1 Poção extra!");
-            }
+            if(tipo === 'maxhp') { runState.rider.maxHp += 15; runState.rider.hp += 15; alert("HP Máximo aumentado!"); } 
+            else if (tipo === 'ataque') { alert("Nesta versão mock, você aprendeu um golpe!"); } 
+            else { alert("Você ganhou 1 Poção extra!"); }
             prosseguirMapa();
         }
     </script>
