@@ -7,136 +7,367 @@
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* Desativar seleção de texto para parecer um aplicativo nativo */
-        *, *::before, *::after {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
+        *, *::before, *::after { box-sizing: border-box; user-select: none; }
+        body { overflow: hidden; background-color: #0f172a; }
+        
+        /* Estilo clássico de menu de RPG (Bordas duplas/gradientes) */
+        .ff-menu {
+            background: linear-gradient(to bottom right, #1e293b, #0f172a);
+            border: 2px solid #334155;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 4px 6px rgba(0,0,0,0.3);
+            border-radius: 6px;
         }
-        body {
-            overflow: hidden;
-            background-color: #0f172a;
+        .ff-btn {
+            text-align: left;
+            width: 100%;
+            padding: 8px 12px;
+            font-family: monospace;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #cbd5e1;
+            border-left: 3px solid transparent;
+            transition: all 0.1s;
         }
+        .ff-btn:hover:not(:disabled), .ff-btn.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-left: 3px solid #10b981;
+            padding-left: 16px;
+        }
+        .ff-btn:disabled { color: #475569; cursor: not-allowed; }
+        
+        .log-area { scroll-behavior: smooth; }
     </style>
 </head>
-<body class="text-slate-100 font-sans h-screen w-screen flex flex-col justify-center items-center p-4">
+<body class="text-slate-100 font-sans h-screen w-screen flex flex-col justify-center items-center p-2 md:p-4">
 
-    <div id="gameContainer" class="w-full max-w-5xl h-full max-h-[640px] bg-slate-800 border border-slate-700 rounded-xl shadow-2xl flex flex-col overflow-hidden relative">
+    <div id="gameContainer" class="w-full max-w-5xl h-full max-h-[700px] flex flex-col overflow-hidden relative">
         
-        <div id="telaBoot" class="flex-1 flex flex-col items-center justify-center p-6 text-center">
-            <h1 class="text-4xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500 uppercase mb-2">
-                Kamen Rider
-            </h1>
-            <h2 class="text-xs font-mono tracking-[0.3em] text-slate-400 uppercase mb-8">
-                Chronicles Roguelike // v0.1
-            </h2>
-            
-            <div class="space-y-3 w-full max-w-xs">
-                <button onclick="iniciarNovoJogo()" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold py-3 px-6 rounded-lg shadow-lg active:scale-95 transition-all uppercase text-sm tracking-wider">
-                    Iniciar Transmissão
-                </button>
-                <div class="text-[10px] font-mono text-slate-500">
-                    Sistema PWA Pronto para Instalação
-                </div>
-            </div>
+        <div id="telaBoot" class="flex-1 flex flex-col items-center justify-center p-6 text-center bg-slate-800 rounded-xl border border-slate-700">
+            <h1 class="text-4xl font-black text-emerald-400 uppercase mb-8">KR: Chronicles</h1>
+            <button onclick="iniciarCombate()" class="w-full max-w-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest">
+                Iniciar Combate Teste
+            </button>
         </div>
 
-        <div id="telaPainel" class="hidden flex-1 flex flex-col p-6">
-            <header class="flex justify-between items-center border-b border-slate-700 pb-4 mb-4">
-                <div>
-                    <h3 class="text-lg font-bold text-emerald-400">Rider_System_Active</h3>
-                    <p class="text-xs font-mono text-slate-400" id="saveStatus">Aguardando registro...</p>
+        <div id="telaBatalha" class="hidden flex-1 flex flex-col gap-2">
+            
+            <header class="bg-slate-800 border border-slate-700 p-3 rounded flex justify-between items-end shadow">
+                <div class="flex-1">
+                    <h2 class="font-bold text-lg text-white tracking-wide" id="hudRiderName">Kuuga (Growing)</h2>
+                    <div class="flex gap-4 mt-1">
+                        <div class="w-32">
+                            <div class="flex justify-between text-[10px] uppercase font-bold text-red-400"><span>HP</span> <span id="hudHp">100/100</span></div>
+                            <div class="w-full bg-slate-900 h-2 rounded"><div id="barHp" class="bg-red-500 h-2 rounded transition-all duration-300" style="width: 100%"></div></div>
+                        </div>
+                        <div class="w-32">
+                            <div class="flex justify-between text-[10px] uppercase font-bold text-cyan-400"><span>Energia</span> <span id="hudSp">10/10</span></div>
+                            <div class="w-full bg-slate-900 h-2 rounded"><div id="barSp" class="bg-cyan-500 h-2 rounded transition-all duration-300" style="width: 100%"></div></div>
+                        </div>
+                    </div>
                 </div>
-                <button onclick="resetarProgresso()" class="bg-slate-700 hover:bg-red-600 px-3 py-1.5 rounded font-mono text-xs transition-colors">
-                    Reset_Data
-                </button>
+                
+                <div class="text-right">
+                    <h2 class="font-bold text-lg text-purple-400 tracking-wide" id="hudEnemyName">Grongi Zu-Gooma-Gu</h2>
+                    <div class="w-32 ml-auto mt-1">
+                        <div class="flex justify-between text-[10px] uppercase font-bold text-purple-300"><span>HP</span> <span id="hudEnemyHp">80/80</span></div>
+                        <div class="w-full bg-slate-900 h-2 rounded"><div id="barEnemyHp" class="bg-purple-500 h-2 rounded transition-all duration-300" style="width: 100%"></div></div>
+                    </div>
+                </div>
             </header>
-            
-            <div class="flex-1 flex items-center justify-center border-2 border-dashed border-slate-700 rounded-lg bg-slate-900/50">
-                <p class="text-slate-500 font-mono text-sm">Fase 2: Estrutura do Menu estilo Final Fantasy será renderizada aqui.</p>
-            </div>
-        </div>
 
+            <div class="flex-1 bg-slate-900 border border-slate-700 rounded relative flex flex-col p-4 overflow-hidden">
+                <div class="absolute top-2 left-2 bg-slate-800 px-2 py-1 rounded text-xs font-mono text-slate-400 border border-slate-700">Turno: <span id="turnCounter">1</span></div>
+                
+                <div class="flex-1 flex justify-between items-center px-10 text-6xl">
+                    <div id="spriteRider" class="transform hover:scale-110 transition-transform cursor-pointer">🏍️</div>
+                    <div id="spriteEnemy" class="transform hover:scale-110 transition-transform animate-pulse">🦇</div>
+                </div>
+
+                <div id="battleLog" class="h-24 w-full bg-slate-800/80 border border-slate-700 rounded p-2 overflow-y-auto log-area font-mono text-xs mt-4">
+                    <p class="text-emerald-400">> Batalha Iniciada!</p>
+                </div>
+            </div>
+
+            <div class="h-48 flex gap-2">
+                <div class="w-1/3 ff-menu p-2 flex flex-col">
+                    <button onclick="mudarAba('ataques')" id="tab-ataques" class="ff-btn active">Atacar</button>
+                    <button onclick="mudarAba('habilidades')" id="tab-habilidades" class="ff-btn">Habilidades</button>
+                    <button onclick="mudarAba('itens')" id="tab-itens" class="ff-btn flex justify-between">
+                        <span>Itens</span> <span id="itemStatus" class="text-[10px] text-emerald-400 pt-1">1/1</span>
+                    </button>
+                    <button onclick="mudarAba('formas')" id="tab-formas" class="ff-btn">Transformar</button>
+                    
+                    <div class="mt-auto pt-2 border-t border-slate-700">
+                        <button onclick="passarTurno()" class="ff-btn !text-yellow-400 hover:!border-yellow-400">Passar Turno</button>
+                    </div>
+                </div>
+
+                <div class="w-2/3 ff-menu p-2 overflow-y-auto" id="menuAcoes">
+                    </div>
+            </div>
+
+        </div>
     </div>
 
     <script>
-        // Configurações futuras do Supabase (Mantenha as variáveis prontas)
-        const supabaseUrl = 'https://SEU_PROJETO.supabase.co';
-        const supabaseKey = 'SUA_CHAVE_ANON_PREENCHIDA_DEPOIS';
-        let supabaseClient = null;
-
-        // Estado Global da Run (Instancia inicial mínima para persistência de dados)
-        let gameState = {
-            runAtiva: false,
-            timestamp: null,
-            mundoAtual: 1,
-            caminhoPasso: 0
-        };
-
-        // Gerenciamento de Telas do DOM
-        const telaBoot = document.getElementById('telaBoot');
-        const telaPainel = document.getElementById('telaPainel');
-        const saveStatus = document.getElementById('saveStatus');
-
-        function verificarSaveLocal() {
-            const save = localStorage.getItem('kr_roguelike_save');
-            if (save) {
-                gameState = JSON.parse(save);
-                if (gameState.runAtiva) {
-                    mostrarPainel();
-                    saveStatus.innerText = `Progresso carregado localmente: Mundo ${gameState.mundoAtual}`;
+        // ================= BANCO DE DADOS LOCAL DO JOGO =================
+        // Estrutura modular: Facilita plugar novos Riders no futuro.
+        const DB_RIDERS = {
+            kuuga: {
+                id: 'kuuga',
+                name: 'Kamen Rider Kuuga',
+                baseHp: 100,
+                maxEnergy: 10,
+                forms: {
+                    growing: {
+                        id: 'growing',
+                        name: 'Growing Form',
+                        sprite: '⚪', // Representação temporária
+                        ataques: [
+                            { nome: 'Soco Fraco', custo: 2, dano: 5, tipo: 'fisico' },
+                            { nome: 'Chute Crescente', custo: 4, dano: 12, tipo: 'fisico' }
+                        ],
+                        habilidades: [
+                            { nome: 'Foco (Recupera SP)', custo: 0, efeito: 'recuperar_sp', valor: 3 }
+                        ]
+                    },
+                    mighty: {
+                        id: 'mighty',
+                        name: 'Mighty Form',
+                        sprite: '🔴',
+                        ataques: [
+                            { nome: 'Mighty Punch', custo: 3, dano: 15, tipo: 'fisico' },
+                            { nome: 'Mighty Kick', custo: 8, dano: 35, tipo: 'finisher' }
+                        ],
+                        habilidades: [
+                            { nome: 'Pose de Combate (Buff Atk)', custo: 3, efeito: 'buff_atk', valor: 1.5 }
+                        ]
+                    }
                 }
             }
+        };
+
+        const DB_ITENS = [
+            { nome: 'Poção de Vida', custo: 2, efeito: 'cura', valor: 30 },
+            { nome: 'Bateria Reserva', custo: 0, efeito: 'recuperar_sp', valor: 5 }
+        ];
+
+        // ================= ESTADO DO COMBATE =================
+        let state = {
+            turno: 1,
+            itemUsado: false, // Regra: 1 item por turno
+            abaAtual: 'ataques',
+            rider: {
+                id: 'kuuga',
+                formaAtual: 'growing',
+                hp: 100, maxHp: 100,
+                sp: 10, maxSp: 10,
+                buffAtk: 1
+            },
+            enemy: {
+                name: 'Grongi Zu-Gooma-Gu',
+                hp: 80, maxHp: 80,
+                danoBase: 8
+            }
+        };
+
+        // DOM Elements
+        const menuAcoes = document.getElementById('menuAcoes');
+        const battleLog = document.getElementById('battleLog');
+
+        // ================= LÓGICA DE INTERFACE =================
+        function iniciarCombate() {
+            document.getElementById('telaBoot').classList.add('hidden');
+            document.getElementById('telaBatalha').classList.remove('hidden');
+            atualizarHUD();
+            mudarAba('ataques');
         }
 
-        function salvarProgresso() {
-            gameState.timestamp = Date.now();
-            localStorage.setItem('kr_roguelike_save', JSON.stringify(gameState));
+        function log(msg, cor = 'text-slate-300') {
+            const p = document.createElement('p');
+            p.className = `mb-1 ${cor}`;
+            p.innerText = `> ${msg}`;
+            battleLog.appendChild(p);
+            battleLog.scrollTop = battleLog.scrollHeight;
         }
 
-        function iniciarNovoJogo() {
-            gameState.runAtiva = true;
-            gameState.mundoAtual = 1;
-            gameState.caminhoPasso = 1;
-            salvarProgresso();
-            mostrarPainel();
-            saveStatus.innerText = "Nova run sincronizada no armazenamento local.";
-        }
+        function atualizarHUD() {
+            const rData = DB_RIDERS[state.rider.id];
+            const fData = rData.forms[state.rider.formaAtual];
 
-        function resetarProgresso() {
-            if (confirm("Deseja apagar os dados da run atual?")) {
-                localStorage.removeItem('kr_roguelike_save');
-                gameState = { runAtiva: false, timestamp: null, mundoAtual: 1, caminhoPasso: 0 };
-                telaPainel.classList.add('hidden');
-                telaBoot.classList.remove('hidden');
+            // Textos
+            document.getElementById('hudRiderName').innerText = `${rData.name} (${fData.name})`;
+            document.getElementById('hudHp').innerText = `${state.rider.hp}/${state.rider.maxHp}`;
+            document.getElementById('hudSp').innerText = `${state.rider.sp}/${state.rider.maxSp}`;
+            document.getElementById('hudEnemyHp').innerText = `${state.enemy.hp}/${state.enemy.maxHp}`;
+            document.getElementById('turnCounter').innerText = state.turno;
+            document.getElementById('spriteRider').innerText = fData.sprite;
+
+            // Barras
+            document.getElementById('barHp').style.width = `${Math.max(0, (state.rider.hp / state.rider.maxHp) * 100)}%`;
+            document.getElementById('barSp').style.width = `${Math.max(0, (state.rider.sp / state.rider.maxSp) * 100)}%`;
+            document.getElementById('barEnemyHp').style.width = `${Math.max(0, (state.enemy.hp / state.enemy.maxHp) * 100)}%`;
+
+            // Status do Item
+            const itemBtn = document.getElementById('itemStatus');
+            if(state.itemUsado) {
+                itemBtn.innerText = "0/1"; itemBtn.classList.replace('text-emerald-400', 'text-red-400');
+            } else {
+                itemBtn.innerText = "1/1"; itemBtn.classList.replace('text-red-400', 'text-emerald-400');
             }
         }
 
-        function mostrarPainel() {
-            telaBoot.classList.add('hidden');
-            telaPainel.classList.remove('hidden');
+        function mudarAba(novaAba) {
+            state.abaAtual = novaAba;
+            
+            // Controle visual das categorias
+            document.querySelectorAll('.ff-menu .ff-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${novaAba}`).classList.add('active');
+
+            menuAcoes.innerHTML = ''; // Limpa slots
+            const fData = DB_RIDERS[state.rider.id].forms[state.rider.formaAtual];
+
+            // Renderiza os slots baseados na aba
+            if (novaAba === 'ataques') {
+                fData.ataques.forEach(atk => criarSlotAcao(atk.nome, atk.custo, () => usarAtaque(atk)));
+            } 
+            else if (novaAba === 'habilidades') {
+                fData.habilidades.forEach(hab => criarSlotAcao(hab.nome, hab.custo, () => usarHabilidade(hab)));
+            } 
+            else if (novaAba === 'itens') {
+                DB_ITENS.forEach(item => {
+                    const btn = criarSlotAcao(item.nome, item.custo, () => usarItem(item));
+                    if(state.itemUsado) btn.disabled = true; // Trava se já usou na rodada
+                });
+            } 
+            else if (novaAba === 'formas') {
+                Object.values(DB_RIDERS[state.rider.id].forms).forEach(forma => {
+                    if(forma.id !== state.rider.formaAtual) {
+                        criarSlotAcao(`Transformar: ${forma.name}`, 3, () => transformar(forma.id));
+                    }
+                });
+            }
         }
 
-        // Inicialização automática
-        window.addEventListener('DOMContentLoaded', () => {
-            verificarSaveLocal();
-        });
-    </script>
-
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                .catch(err => console.log('Erro ao registrar Service Worker:', err));
-            });
+        function criarSlotAcao(nome, custo, callback) {
+            const btn = document.createElement('button');
+            btn.className = 'ff-btn flex justify-between mb-1';
+            // Trava botão se não tiver energia suficiente
+            if (state.rider.sp < custo) btn.disabled = true;
+            
+            btn.innerHTML = `<span>${nome}</span> <span class="text-cyan-500 font-bold">${custo > 0 ? custo+' SP' : 'Livre'}</span>`;
+            btn.onclick = callback;
+            menuAcoes.appendChild(btn);
+            return btn;
         }
+
+        // ================= MECÂNICAS DE AÇÃO =================
+        function usarAtaque(atk) {
+            if (state.rider.sp < atk.custo) return;
+            
+            state.rider.sp -= atk.custo;
+            const danoFinal = Math.floor(atk.dano * state.rider.buffAtk);
+            state.enemy.hp -= danoFinal;
+            state.rider.buffAtk = 1; // Reseta buff após atacar
+            
+            log(`Você usou [${atk.nome}] causando ${danoFinal} de dano!`, 'text-white');
+            animarAcao('spriteRider');
+            verificarEstadoBatalha();
+        }
+
+        function usarHabilidade(hab) {
+            if (state.rider.sp < hab.custo) return;
+            state.rider.sp -= hab.custo;
+
+            if (hab.efeito === 'recuperar_sp') {
+                state.rider.sp = Math.min(state.rider.maxSp, state.rider.sp + hab.valor);
+                log(`Foco! Você recuperou ${hab.valor} de Energia.`, 'text-cyan-300');
+            } else if (hab.efeito === 'buff_atk') {
+                state.rider.buffAtk = hab.valor;
+                log(`Seu próximo ataque causará mais dano!`, 'text-orange-300');
+            }
+            atualizarHUD(); mudarAba(state.abaAtual);
+        }
+
+        function usarItem(item) {
+            if (state.itemUsado || state.rider.sp < item.custo) return;
+            state.itemUsado = true;
+            state.rider.sp -= item.custo;
+
+            if (item.efeito === 'cura') {
+                state.rider.hp = Math.min(state.rider.maxHp, state.rider.hp + item.valor);
+                log(`Usou [${item.nome}]. Curou ${item.valor} HP.`, 'text-emerald-300');
+            } else if (item.efeito === 'recuperar_sp') {
+                state.rider.sp = Math.min(state.rider.maxSp, state.rider.sp + item.valor);
+                log(`Usou [${item.nome}]. Ganhou energia extra.`, 'text-cyan-300');
+            }
+            atualizarHUD(); mudarAba(state.abaAtual); // Re-renderiza abas para travar os itens
+        }
+
+        function transformar(novaFormaId) {
+            const custoTransformacao = 3; // Regra global de transformação
+            if (state.rider.sp < custoTransformacao) return;
+            
+            state.rider.sp -= custoTransformacao;
+            state.rider.formaAtual = novaFormaId;
+            const nomeNovaForma = DB_RIDERS[state.rider.id].forms[novaFormaId].name;
+            
+            log(`HENSHIN! Mudou para ${nomeNovaForma}!`, 'text-yellow-400 font-bold');
+            animarAcao('spriteRider', 'scale-150');
+            atualizarHUD(); mudarAba('ataques'); // Força ir para aba de ataques da nova forma
+        }
+
+        function passarTurno() {
+            log('Fim do seu turno.', 'text-slate-500');
+            
+            // Turno do inimigo simulado
+            setTimeout(() => {
+                if(state.enemy.hp > 0) {
+                    const danoSofrido = state.enemy.danoBase + Math.floor(Math.random() * 4);
+                    state.rider.hp -= danoSofrido;
+                    log(`Inimigo atacou e causou ${danoSofrido} de dano!`, 'text-red-400');
+                    animarAcao('spriteEnemy');
+                }
+                
+                // Reseta a rodada para o jogador
+                setTimeout(() => {
+                    state.turno++;
+                    state.rider.sp = state.rider.maxSp; // Reseta energia (Action Points)
+                    state.itemUsado = false; // Reseta limite de itens
+                    log(`-- Início do Turno ${state.turno} --`, 'text-emerald-500 mt-2');
+                    verificarEstadoBatalha();
+                }, 1000);
+
+            }, 800);
+        }
+
+        function verificarEstadoBatalha() {
+            atualizarHUD();
+            mudarAba(state.abaAtual); // Atualiza os menus dinamicamente (botões ativam/desativam baseado no SP)
+
+            if (state.enemy.hp <= 0) {
+                log('Você derrotou o monstro! Fim da simulação.', 'text-yellow-400 font-bold text-lg');
+                menuAcoes.innerHTML = '<div class="p-2 text-center text-emerald-400">VITÓRIA!</div>';
+                // No futuro aqui ativamos a Tela de Recompensa
+            } else if (state.rider.hp <= 0) {
+                log('Você foi derrotado. GAME OVER.', 'text-red-500 font-bold text-lg');
+                menuAcoes.innerHTML = '<div class="p-2 text-center text-red-500">DERROTA!</div>';
+            }
+        }
+
+        // Função auxiliar para dar um pequeno efeito visual no DOM
+        function animarAcao(elementId, fx = 'scale-125') {
+            const el = document.getElementById(elementId);
+            el.classList.add(fx);
+            setTimeout(() => el.classList.remove(fx), 200);
+        }
+
     </script>
 </body>
 </html>
