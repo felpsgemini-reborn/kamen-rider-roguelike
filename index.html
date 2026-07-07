@@ -38,11 +38,7 @@
         ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
         
-        /* Animações do Toast */
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .toast-enter { animation: slideIn 0.3s ease-out forwards; }
     </style>
 </head>
@@ -64,34 +60,40 @@
                 <h2 class="font-bold text-emerald-400 font-mono tracking-widest uppercase text-sm md:text-base">Setor de Exploração</h2>
                 <div class="text-yellow-400 font-mono text-sm font-bold bg-slate-900 px-3 py-1 rounded border border-slate-700">🪙 <span id="hudMoedas">0</span></div>
             </header>
-            
             <div class="flex-1 overflow-y-auto flex flex-col-reverse justify-start items-center p-8 gap-12 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGRpdiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojMGYxNzJhO2hlaWdodDoxMDAlO3dpZHRoOjEwMCU7Ij48L2Rpdj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxIiBmaWxsPSIjMzM0MTU1Ii8+PC9zdmc+')] bg-repeat" id="mapContainer"></div>
-            
-            <div class="absolute bottom-4 left-0 w-full text-center pointer-events-none text-slate-500 font-mono text-xs uppercase tracking-widest opacity-50 font-bold">↓ Ponto de Partida ↓</div>
         </div>
 
         <div id="telaRecompensa" class="hidden flex-1 flex flex-col items-center justify-center p-4 md:p-6 bg-slate-900/95 z-20 absolute inset-0">
             <h2 class="text-2xl md:text-3xl font-black text-yellow-400 mb-2 uppercase text-center">Batalha Concluída!</h2>
-            <p class="text-emerald-400 mb-8 font-mono text-sm md:text-base text-center">> Arquivos descriptografados. Selecione:</p>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-3xl mb-8">
-                <button onclick="coletarRecompensa('ataque')" class="ff-menu p-4 md:p-6 hover:border-emerald-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
-                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">⚔️</div>
-                    <h3 class="font-bold text-white mb-2 text-sm md:text-base">Novo Ataque</h3>
-                    <p class="text-[10px] md:text-xs text-slate-400">Adiciona golpe aleatório ao Menu da Forma Base.</p>
-                </button>
-                <button onclick="coletarRecompensa('maxhp')" class="ff-menu p-4 md:p-6 hover:border-blue-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
-                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">❤️</div>
-                    <h3 class="font-bold text-white mb-2 text-sm md:text-base">Aprimoramento Core</h3>
-                    <p class="text-[10px] md:text-xs text-slate-400">Aumenta Vida Máxima e Cura +15 HP.</p>
-                </button>
-                <button onclick="coletarRecompensa('item')" class="ff-menu p-4 md:p-6 hover:border-yellow-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
-                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">💊</div>
-                    <h3 class="font-bold text-white mb-2 text-sm md:text-base">Suprimentos</h3>
-                    <p class="text-[10px] md:text-xs text-slate-400">Receba +1 Poção de Vida no Inventário.</p>
-                </button>
+            <div id="recCategorias" class="w-full max-w-3xl flex flex-col items-center">
+                <p class="text-emerald-400 mb-8 font-mono text-sm md:text-base text-center">> Arquivos descriptografados. Selecione:</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mb-8">
+                    <button onclick="prepararDraftAtaque()" class="ff-menu p-4 md:p-6 hover:border-emerald-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
+                        <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">⚔️</div>
+                        <h3 class="font-bold text-white mb-2 text-sm md:text-base">Análise de Combate</h3>
+                        <p class="text-[10px] md:text-xs text-slate-400">Escolha 1 de 3 novos ataques para a Forma Base.</p>
+                    </button>
+                    <button onclick="coletarRecompensaDireta('maxhp')" class="ff-menu p-4 md:p-6 hover:border-blue-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
+                        <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">❤️</div>
+                        <h3 class="font-bold text-white mb-2 text-sm md:text-base">Aprimoramento Core</h3>
+                        <p class="text-[10px] md:text-xs text-slate-400">Aumenta Vida Máxima e Cura +15 HP.</p>
+                    </button>
+                    <button onclick="coletarRecompensaDireta('item')" class="ff-menu p-4 md:p-6 hover:border-yellow-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
+                        <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">💊</div>
+                        <h3 class="font-bold text-white mb-2 text-sm md:text-base">Suprimentos</h3>
+                        <p class="text-[10px] md:text-xs text-slate-400">Receba +1 Poção de Vida no Inventário.</p>
+                    </button>
+                </div>
+                <button onclick="prosseguirMapa()" class="text-slate-400 hover:text-white px-6 py-2 text-xs font-mono uppercase tracking-widest border-b border-slate-700 hover:border-white transition-colors">Ignorar (Skip)</button>
             </div>
-            <button onclick="prosseguirMapa()" class="text-slate-400 hover:text-white px-6 py-2 text-xs font-mono uppercase tracking-widest border-b border-slate-700 hover:border-white transition-colors">Ignorar (Skip)</button>
+
+            <div id="recDraft" class="hidden w-full max-w-3xl flex flex-col items-center">
+                <p class="text-emerald-400 mb-8 font-mono text-sm md:text-base text-center">> Extraindo dados de combate. Escolha 1 ataque:</p>
+                <div id="containerCartasDraft" class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mb-8">
+                    </div>
+                <button onclick="voltarCategorias()" class="text-slate-400 hover:text-white px-6 py-2 text-xs font-mono uppercase tracking-widest border-b border-slate-700 hover:border-white transition-colors">Voltar</button>
+            </div>
         </div>
 
         <div id="telaBatalha" class="hidden flex-1 flex flex-col gap-2 p-2">
@@ -109,7 +111,6 @@
                         </div>
                     </div>
                 </div>
-                
                 <div class="text-right flex-1 flex flex-col items-end">
                     <h2 class="font-bold text-sm md:text-lg text-purple-400 tracking-wide truncate max-w-full" id="hudEnemyName">Inimigo</h2>
                     <div class="w-24 md:w-32 mt-1">
@@ -121,12 +122,10 @@
 
             <div class="flex-1 bg-slate-900 border border-slate-700 rounded relative flex flex-col p-4 overflow-hidden min-h-[150px]">
                 <div class="absolute top-2 left-2 bg-slate-800 px-2 py-1 rounded text-xs font-mono text-slate-400 border border-slate-700 shadow">Andar: <span id="hudAndar" class="text-white">1</span> | Turno: <span id="turnCounter" class="text-white">1</span></div>
-                
                 <div class="flex-1 flex justify-between items-center px-4 md:px-10 text-5xl md:text-6xl">
                     <div id="spriteRider" class="transform transition-transform">🏍️</div>
                     <div id="spriteEnemy" class="transform animate-pulse">🦇</div>
                 </div>
-
                 <div id="battleLog" class="h-20 md:h-24 w-full bg-slate-800/80 border border-slate-700 rounded p-2 overflow-y-auto log-area font-mono text-[10px] md:text-xs mt-4 shadow-inner shrink-0">
                     <p class="text-emerald-400">> Batalha Iniciada!</p>
                 </div>
@@ -151,23 +150,19 @@
     </div>
 
     <script>
-        // ================= FUNÇÃO DE TOAST (AVISOS FLUTUANTES) =================
         function mostrarToast(mensagem, corClasses = 'bg-slate-800 border-slate-600 text-white') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = `toast-enter p-3 rounded shadow-xl border-l-4 font-mono text-xs md:text-sm ${corClasses}`;
             toast.innerHTML = mensagem;
             container.appendChild(toast);
-            
             setTimeout(() => {
-                toast.classList.replace('toast-enter', 'opacity-0');
-                toast.style.transition = 'all 0.3s';
-                toast.style.transform = 'translateX(100%)';
-                setTimeout(() => toast.remove(), 300);
+                toast.classList.replace('toast-enter', 'opacity-0'); toast.style.transition = 'all 0.3s';
+                toast.style.transform = 'translateX(100%)'; setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
 
-        // ================= DADOS IMUTÁVEIS (MOLDES) =================
+        // ================= DADOS =================
         const DB_RIDERS = {
             kuuga: {
                 id: 'kuuga', name: 'Kamen Rider Kuuga', baseHp: 100, maxEnergy: 10,
@@ -175,52 +170,44 @@
                     growing: {
                         id: 'growing', name: 'Growing Form', sprite: '⚪',
                         ataques: [ { nome: 'Soco Fraco', custo: 2, dano: 5 }, { nome: 'Chute Crescente', custo: 4, dano: 12 } ],
-                        // BALANCEAMENTO: Adicionado "Fim de Turno" na descrição da habilidade
-                        habilidades: [ { nome: 'Foco (Passa Turno)', custo: 0, efeito: 'foco_energia', valor: 4 } ]
+                        // FIX: Foco agora tem limite de usos em vez de passar o turno.
+                        habilidades: [ { nome: 'Foco (+SP)', custo: 0, efeito: 'foco_energia', valor: 4, usoPorTurno: 1 } ]
                     },
                     mighty: {
                         id: 'mighty', name: 'Mighty Form', sprite: '🔴',
                         ataques: [ { nome: 'Mighty Punch', custo: 3, dano: 15 }, { nome: 'Mighty Kick', custo: 8, dano: 35 } ],
-                        habilidades: [ { nome: 'Pose (Buff Atk)', custo: 3, efeito: 'buff_atk', valor: 1.5 } ]
+                        habilidades: [ { nome: 'Pose (Buff Atk)', custo: 3, efeito: 'buff_atk', valor: 1.5, usoPorTurno: 1 } ]
                     }
                 }
             }
         };
 
         const DB_ATAQUES_POOL = [
-            { nome: 'Combo Relâmpago', custo: 3, dano: 10 },
-            { nome: 'Chute Giratório', custo: 5, dano: 18 },
-            { nome: 'Golpe Esmagador', custo: 6, dano: 24 },
-            { nome: 'Sequência Feroz', custo: 4, dano: 15 },
-            { nome: 'Impacto Direto', custo: 7, dano: 30 }
+            { nome: 'Combo Relâmpago', custo: 3, dano: 10, desc: 'Ataque rápido e eficiente em energia.' },
+            { nome: 'Chute Giratório', custo: 5, dano: 18, desc: 'Golpe amplo de médio impacto.' },
+            { nome: 'Golpe Esmagador', custo: 6, dano: 24, desc: 'Pesado e custoso, mas destrutivo.' },
+            { nome: 'Sequência Feroz', custo: 4, dano: 15, desc: 'Série de ataques sequenciais.' },
+            { nome: 'Impacto Direto', custo: 7, dano: 30, desc: 'Canaliza muita energia para alto dano.' },
+            { nome: 'Voadora Frontal', custo: 5, dano: 20, desc: 'Iniciação agressiva de combate.' }
         ];
 
-        // ================= ESTADO GLOBAL DA RUN (MUTÁVEL) =================
-        let runState = {
-            andarAtual: 0, mapa: [], moedas: 0, pocaoCount: 1, // Começa com 1 poção
-            rider: null // Será populado pelo "Clone" ao iniciar a run
-        };
-
-        let battleState = { ativa: false, turno: 1, itemUsado: false, abaAtual: 'ataques', enemy: null };
+        let runState = { andarAtual: 0, mapa: [], moedas: 0, pocaoCount: 1, rider: null };
+        
+        // FIX: Fase adicionada para arrumar o bug de clicar no turno do inimigo
+        let battleState = { fase: 'jogador', turno: 1, itemUsado: false, habilidadesUsadas: {}, abaAtual: 'ataques', enemy: null };
 
         const menusDOM = { boot: document.getElementById('telaBoot'), mapa: document.getElementById('telaMapa'), batalha: document.getElementById('telaBatalha'), recompensa: document.getElementById('telaRecompensa') };
         function mostrarTela(tela) { Object.values(menusDOM).forEach(el => el.classList.add('hidden')); menusDOM[tela].classList.remove('hidden'); }
 
-        // ================= MAPA & PREPARAÇÃO =================
+        // ================= MAPA =================
         function iniciarRun() {
             runState.moedas = 0; runState.andarAtual = 0; runState.pocaoCount = 1;
-            
-            // DEEP COPY: Clona o molde do Kuuga para a run atual. Assim, os ataques não ficam salvos no jogo inteiro se ele morrer.
             runState.rider = JSON.parse(JSON.stringify(DB_RIDERS.kuuga));
-            runState.rider.formaAtual = 'growing';
-            runState.rider.hp = runState.rider.baseHp; runState.rider.maxHp = runState.rider.baseHp;
-            runState.rider.sp = runState.rider.maxEnergy; runState.rider.maxSp = runState.rider.maxEnergy;
-            runState.rider.buffAtk = 1;
-
+            runState.rider.formaAtual = 'growing'; runState.rider.hp = runState.rider.baseHp; runState.rider.maxHp = runState.rider.baseHp;
+            runState.rider.sp = runState.rider.maxEnergy; runState.rider.maxSp = runState.rider.maxEnergy; runState.rider.buffAtk = 1;
             gerarMapaAleatorio(); renderizarMapa(); mostrarTela('mapa');
         }
 
-        // ... (Gerar Mapa e Renderizar Mapa continuam exatamente iguais ao anterior)
         function gerarMapaAleatorio() {
             runState.mapa = [];
             for (let i = 0; i < 10; i++) {
@@ -242,9 +229,7 @@
 
         function renderizarMapa() {
             const container = document.getElementById('mapContainer');
-            document.getElementById('hudMoedas').innerText = runState.moedas;
-            container.innerHTML = '';
-
+            document.getElementById('hudMoedas').innerText = runState.moedas; container.innerHTML = '';
             runState.mapa.forEach((andar, idx) => {
                 const row = document.createElement('div'); row.className = 'flex gap-8 justify-center w-full relative mb-4';
                 andar.forEach(no => {
@@ -258,22 +243,16 @@
                 });
                 container.appendChild(row);
             });
-            setTimeout(() => {
-                const atv = container.querySelector('.map-node.active');
-                if(atv) atv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
+            setTimeout(() => { const atv = container.querySelector('.map-node.active'); if(atv) atv.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
         }
 
         function entrarNoMapa(tipo) {
             if (tipo === 'batalha' || tipo === 'chefe') { prepararCombate(tipo); mostrarTela('batalha'); }
             else if (tipo === 'descanso') {
                 runState.rider.hp = Math.min(runState.rider.maxHp, runState.rider.hp + 30);
-                mostrarToast('Casa de Descanso! Recuperou 30 HP.', 'border-emerald-500 bg-slate-800 text-emerald-400');
-                prosseguirMapa();
+                mostrarToast('Casa de Descanso! Recuperou 30 HP.', 'border-emerald-500 bg-slate-800 text-emerald-400'); prosseguirMapa();
             } else {
-                mostrarToast(`Nó de ${tipo} em construção! +10 Moedas.`, 'border-yellow-500 bg-slate-800');
-                runState.moedas += 10;
-                prosseguirMapa();
+                mostrarToast(`Nó de ${tipo} em construção! +10 Moedas.`, 'border-yellow-500 bg-slate-800'); runState.moedas += 10; prosseguirMapa();
             }
         }
 
@@ -292,7 +271,7 @@
         }
 
         function prepararCombate(tipo) {
-            battleState.ativa = true; battleState.turno = 1; battleState.itemUsado = false;
+            battleState.fase = 'jogador'; battleState.turno = 1; battleState.itemUsado = false; battleState.habilidadesUsadas = {};
             runState.rider.formaAtual = 'growing'; runState.rider.sp = runState.rider.maxSp;
             battleState.enemy = { 
                 name: tipo === 'chefe' ? 'Boss Grongi' : 'Grongi Aleatório', 
@@ -316,8 +295,7 @@
             document.getElementById('barSp').style.width = `${Math.max(0, (r.sp / r.maxSp) * 100)}%`;
             document.getElementById('barEnemyHp').style.width = `${Math.max(0, (battleState.enemy.hp / battleState.enemy.maxHp) * 100)}%`;
             
-            const ib = document.getElementById('itemStatus');
-            ib.innerText = runState.pocaoCount; // Mostra a quantidade real no botão da Aba
+            const ib = document.getElementById('itemStatus'); ib.innerText = runState.pocaoCount;
             ib.className = `text-[10px] pt-1 ${runState.pocaoCount > 0 && !battleState.itemUsado ? 'text-emerald-400' : 'text-red-400'}`;
         }
 
@@ -328,71 +306,77 @@
 
             const menuAcoes = document.getElementById('menuAcoes'); menuAcoes.innerHTML = '';
             
-            if (!battleState.ativa) {
-                if(runState.rider.hp > 0) menuAcoes.innerHTML = `<button onclick="vencerCombate()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Descriptografar Recompensa</button>`;
-                else menuAcoes.innerHTML = `<button onclick="mostrarTela('boot')" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Retornar à Base</button>`;
-                return;
+            // FIX: Controle Estrito de Fases
+            if (battleState.fase === 'vitoria') {
+                menuAcoes.innerHTML = `<button onclick="vencerCombate()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Acessar Recompensa</button>`; return;
+            } else if (battleState.fase === 'derrota') {
+                menuAcoes.innerHTML = `<button onclick="mostrarTela('boot')" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Fim de Jogo</button>`; return;
+            } else if (battleState.fase === 'inimigo') {
+                menuAcoes.innerHTML = `<div class="p-4 text-center text-slate-500 font-mono animate-pulse mt-4 uppercase">Turno do Inimigo...</div>`; return;
             }
 
-            const fData = runState.rider.forms[runState.rider.formaAtual]; // Lê do clone
+            const fData = runState.rider.forms[runState.rider.formaAtual];
 
-            if (novaAba === 'ataques') fData.ataques.forEach(a => criarSlotAcao(a.nome, a.custo, () => usarAtaque(a)));
-            else if (novaAba === 'habilidades') fData.habilidades.forEach(h => criarSlotAcao(h.nome, h.custo, () => usarHabilidade(h)));
+            if (novaAba === 'ataques') fData.ataques.forEach(a => criarSlotAcao(a.nome, a.custo, false, () => usarAtaque(a)));
+            else if (novaAba === 'habilidades') fData.habilidades.forEach(h => {
+                // FIX: Checa limite de uso por turno
+                let travado = (battleState.habilidadesUsadas[h.nome] || 0) >= h.usoPorTurno;
+                criarSlotAcao(h.nome + (travado ? ' (Esgotado)' : ''), h.custo, travado, () => usarHabilidade(h));
+            });
             else if (novaAba === 'itens') {
-                const b = criarSlotAcao(`Poção de Cura (Tem: ${runState.pocaoCount})`, 2, () => usarItem());
-                if(battleState.itemUsado || runState.pocaoCount <= 0) b.disabled = true;
+                const b = criarSlotAcao(`Poção de Cura`, 2, (battleState.itemUsado || runState.pocaoCount <= 0), () => usarItem());
             }
-            else if (novaAba === 'formas') Object.values(runState.rider.forms).forEach(f => { if(f.id !== runState.rider.formaAtual) criarSlotAcao(`Form: ${f.name}`, 3, () => transformar(f.id)); });
+            else if (novaAba === 'formas') Object.values(runState.rider.forms).forEach(f => { if(f.id !== runState.rider.formaAtual) criarSlotAcao(`Form: ${f.name}`, 3, false, () => transformar(f.id)); });
         }
 
-        function criarSlotAcao(nome, custo, cb) {
+        function criarSlotAcao(nome, custo, travadoForcado, cb) {
             const btn = document.createElement('button'); btn.className = 'ff-btn flex justify-between items-center mb-1 shrink-0';
-            if (runState.rider.sp < custo) btn.disabled = true;
+            if (runState.rider.sp < custo || travadoForcado) btn.disabled = true;
             btn.innerHTML = `<span class="truncate pr-2">${nome}</span> <span class="text-cyan-500 font-bold shrink-0">${custo > 0 ? custo+' SP' : 'Livre'}</span>`;
             btn.onclick = cb; document.getElementById('menuAcoes').appendChild(btn); return btn;
         }
 
         function usarAtaque(atk) {
-            if (!battleState.ativa || runState.rider.sp < atk.custo) return;
+            if (battleState.fase !== 'jogador' || runState.rider.sp < atk.custo) return;
             runState.rider.sp -= atk.custo; const d = Math.floor(atk.dano * runState.rider.buffAtk);
             battleState.enemy.hp -= d; runState.rider.buffAtk = 1;
             log(`Usou [${atk.nome}] causando ${d} de dano!`); verificarFim();
         }
 
         function usarHabilidade(hab) {
-            if (!battleState.ativa || runState.rider.sp < hab.custo) return;
+            if (battleState.fase !== 'jogador' || runState.rider.sp < hab.custo) return;
+            
+            // Incrementa uso no turno
+            battleState.habilidadesUsadas[hab.nome] = (battleState.habilidadesUsadas[hab.nome] || 0) + 1;
             runState.rider.sp -= hab.custo;
             
-            // BALANCEAMENTO: Foco agora encerra o turno após recuperar SP!
             if(hab.efeito === 'foco_energia') { 
                 runState.rider.sp = Math.min(runState.rider.maxSp, runState.rider.sp + hab.valor); 
-                log(`Concentrou poder! Recuperou ${hab.valor} SP. O FOCO ENCERROU O SEU TURNO.`, 'text-cyan-300 font-bold'); 
-                verificarFim();
-                if(battleState.ativa) passarTurno(); // Força o passe de turno
-                return;
+                log(`Foco! Recuperou ${hab.valor} SP.`, 'text-cyan-300 font-bold'); 
             }
             else if(hab.efeito === 'buff_atk') { runState.rider.buffAtk = hab.valor; log(`Ataque Buffado!`, 'text-orange-300'); }
             verificarFim();
         }
 
         function usarItem() {
-            if (!battleState.ativa || battleState.itemUsado || runState.pocaoCount <= 0 || runState.rider.sp < 2) return;
+            if (battleState.fase !== 'jogador' || battleState.itemUsado || runState.pocaoCount <= 0 || runState.rider.sp < 2) return;
             battleState.itemUsado = true; runState.rider.sp -= 2; runState.pocaoCount--;
             runState.rider.hp = Math.min(runState.rider.maxHp, runState.rider.hp + 30);
-            log(`Usou [Poção de Cura]. Curou 30 HP.`, 'text-emerald-300');
-            verificarFim();
+            log(`Usou [Poção de Cura]. Curou 30 HP.`, 'text-emerald-300'); verificarFim();
         }
 
         function transformar(novaForma) {
-            if (!battleState.ativa || runState.rider.sp < 3) return;
+            if (battleState.fase !== 'jogador' || runState.rider.sp < 3) return;
             runState.rider.sp -= 3; runState.rider.formaAtual = novaForma;
             log(`HENSHIN! ${runState.rider.forms[novaForma].name}!`, 'text-yellow-400 font-bold');
             atualizarHUD(); mudarAba('ataques');
         }
 
         function passarTurno() {
-            if (!battleState.ativa) return;
-            log('Fim do seu turno.', 'text-slate-500'); battleState.ativa = false; mudarAba(battleState.abaAtual);
+            if (battleState.fase !== 'jogador') return;
+            log('Fim do seu turno.', 'text-slate-500'); 
+            battleState.fase = 'inimigo'; 
+            mudarAba(battleState.abaAtual); // Trava o menu visualmente
             
             setTimeout(() => {
                 if(battleState.enemy.hp > 0) {
@@ -402,8 +386,9 @@
                 setTimeout(() => {
                     verificarFim(); 
                     if(battleState.enemy.hp > 0 && runState.rider.hp > 0) {
-                        battleState.turno++; runState.rider.sp = runState.rider.maxSp; battleState.itemUsado = false;
-                        battleState.ativa = true; 
+                        battleState.turno++; runState.rider.sp = runState.rider.maxSp; 
+                        battleState.itemUsado = false; battleState.habilidadesUsadas = {}; // Limpa cooldowns do turno
+                        battleState.fase = 'jogador'; 
                         log(`-- Início do Turno ${battleState.turno} --`, 'text-emerald-500 mt-2');
                         atualizarHUD(); mudarAba(battleState.abaAtual);
                     }
@@ -412,47 +397,74 @@
         }
 
         function verificarFim() {
-            atualizarHUD(); mudarAba(battleState.abaAtual);
-            if (battleState.enemy.hp <= 0) { battleState.ativa = false; log('VITÓRIA!', 'text-yellow-400 font-bold text-lg'); mudarAba('ataques'); } 
-            else if (runState.rider.hp <= 0) { battleState.ativa = false; log('GAME OVER.', 'text-red-500 font-bold text-lg'); mudarAba('ataques'); }
+            if (battleState.enemy.hp <= 0) { battleState.fase = 'vitoria'; log('VITÓRIA!', 'text-yellow-400 font-bold text-lg'); } 
+            else if (runState.rider.hp <= 0) { battleState.fase = 'derrota'; log('GAME OVER.', 'text-red-500 font-bold text-lg'); }
+            atualizarHUD(); mudarAba(battleState.abaAtual); // Força re-render para mostrar o botão certo
         }
 
-        // ================= LÓGICA REAL DE RECOMPENSA =================
+        // ================= DRAFT DE RECOMPENSA (1 de 3) =================
         function vencerCombate() {
             const moedasGanhas = 15 + Math.floor(Math.random() * 10);
             runState.moedas += moedasGanhas;
             document.getElementById('hudMoedas').innerText = runState.moedas;
+            document.getElementById('recCategorias').classList.remove('hidden');
+            document.getElementById('recDraft').classList.add('hidden');
             mostrarTela('recompensa');
         }
 
-        function coletarRecompensa(tipo) {
+        function coletarRecompensaDireta(tipo) {
             if(tipo === 'maxhp') { 
                 runState.rider.maxHp += 15; runState.rider.hp += 15; 
                 mostrarToast("Aprimoramento Core: +15 HP e Cura Efetuada!", "border-blue-500 bg-blue-900 text-white"); 
-            } 
-            else if (tipo === 'ataque') { 
-                // Pega os ataques que o Kuuga Base (Growing) já tem na run atual
-                const ataquesAtuais = runState.rider.forms.growing.ataques.map(a => a.nome);
-                
-                // Filtra da Pool os ataques que ele AINDA NÃO TEM
-                const ataquesDisponiveis = DB_ATAQUES_POOL.filter(a => !ataquesAtuais.includes(a.nome));
-                
-                if (ataquesDisponiveis.length > 0) {
-                    // Sorteia um novo
-                    const novoAtaque = ataquesDisponiveis[Math.floor(Math.random() * ataquesDisponiveis.length)];
-                    // INVENTÁRIO REAL: Insere o ataque no clone da run atual
-                    runState.rider.forms.growing.ataques.push(novoAtaque);
-                    mostrarToast(`Arquivo Adquirido: ${novoAtaque.nome} adicionado ao Menu!`, "border-emerald-500 bg-emerald-900 text-white");
-                } else {
-                    mostrarToast(`Você já possui todos os ataques básicos! +50 Moedas como compensação.`, "border-yellow-500 bg-yellow-900 text-white");
-                    runState.moedas += 50;
-                }
-            } 
-            else if (tipo === 'item') { 
+            } else if (tipo === 'item') { 
                 runState.pocaoCount++;
-                mostrarToast(`Suprimentos recebidos! Poções atuais: ${runState.pocaoCount}`, "border-yellow-500 bg-slate-800 text-yellow-400");
+                mostrarToast(`Suprimentos! Poções atuais: ${runState.pocaoCount}`, "border-yellow-500 bg-slate-800 text-yellow-400");
             }
             prosseguirMapa();
+        }
+
+        function prepararDraftAtaque() {
+            const ataquesAtuais = runState.rider.forms.growing.ataques.map(a => a.nome);
+            const disponiveis = DB_ATAQUES_POOL.filter(a => !ataquesAtuais.includes(a.nome));
+            
+            if (disponiveis.length === 0) {
+                mostrarToast("Você já possui todos os ataques! Ganhou 50 Moedas.", "border-yellow-500 bg-yellow-900 text-white");
+                runState.moedas += 50; prosseguirMapa(); return;
+            }
+
+            // Embaralha e pega até 3 cartas
+            const embaralhado = disponiveis.sort(() => 0.5 - Math.random());
+            const opcoes = embaralhado.slice(0, 3);
+            
+            const container = document.getElementById('containerCartasDraft');
+            container.innerHTML = '';
+            
+            opcoes.forEach(atk => {
+                const btn = document.createElement('button');
+                btn.className = 'ff-menu p-4 hover:border-emerald-400 hover:-translate-y-2 transition-transform text-left cursor-pointer flex flex-col h-full';
+                btn.innerHTML = `
+                    <div class="flex justify-between items-start mb-2 border-b border-slate-700 pb-2">
+                        <h3 class="font-bold text-white text-sm md:text-base">${atk.nome}</h3>
+                        <span class="text-cyan-400 font-bold text-xs bg-slate-800 px-2 py-1 rounded border border-slate-700">${atk.custo} SP</span>
+                    </div>
+                    <div class="text-red-400 font-mono text-xs mb-2">Dano: ${atk.dano}</div>
+                    <p class="text-[10px] md:text-xs text-slate-400 italic mt-auto">${atk.desc}</p>
+                `;
+                btn.onclick = () => {
+                    runState.rider.forms.growing.ataques.push(atk);
+                    mostrarToast(`Arquivo Adquirido: ${atk.nome}!`, "border-emerald-500 bg-emerald-900 text-white");
+                    prosseguirMapa();
+                };
+                container.appendChild(btn);
+            });
+
+            document.getElementById('recCategorias').classList.add('hidden');
+            document.getElementById('recDraft').classList.remove('hidden');
+        }
+
+        function voltarCategorias() {
+            document.getElementById('recDraft').classList.add('hidden');
+            document.getElementById('recCategorias').classList.remove('hidden');
         }
     </script>
 </body>
