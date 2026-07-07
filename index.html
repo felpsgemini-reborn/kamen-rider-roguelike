@@ -21,12 +21,10 @@
         .ff-btn {
             text-align: left; width: 100%; padding: 8px 12px; font-family: monospace;
             font-size: 14px; text-transform: uppercase; color: #cbd5e1;
-            border-left: 3px solid transparent; transition: all 0.1s;
-            cursor: pointer;
+            border-left: 3px solid transparent; transition: all 0.1s; cursor: pointer;
         }
         .ff-btn:hover:not(:disabled), .ff-btn.active {
-            background: rgba(255, 255, 255, 0.1); color: #fff;
-            border-left: 3px solid #10b981; padding-left: 16px;
+            background: rgba(255, 255, 255, 0.1); color: #fff; border-left: 3px solid #10b981; padding-left: 16px;
         }
         .ff-btn:disabled { color: #475569; cursor: not-allowed; }
         .ff-btn:active:not(:disabled) { transform: scale(0.98); background: rgba(16, 185, 129, 0.2); }
@@ -142,9 +140,11 @@
             <div class="flex-1 bg-slate-900 border border-slate-700 rounded relative flex flex-col p-4 overflow-hidden min-h-[150px]">
                 <div class="absolute top-2 left-2 bg-slate-800 px-2 py-1 rounded text-xs font-mono text-slate-400 border border-slate-700 shadow">Andar: <span id="hudAndar" class="text-white">1</span> | Turno: <span id="turnCounter" class="text-white">1</span> <span id="badgeFaseTurno" class="ml-2 bg-blue-900 px-1 rounded text-white font-bold uppercase text-[10px]"></span></div>
                 
-                <div class="flex-1 flex justify-between items-center px-4 md:px-12 text-5xl md:text-6xl relative">
-                    <div id="spriteRider" class="transform transition-transform duration-200">⚪</div>
-                    <div id="spriteCompanheiro" class="transform transition-transform duration-200 text-4xl hidden opacity-80"></div>
+                <div class="flex-1 flex justify-between items-end px-4 md:px-12 text-5xl md:text-6xl relative pb-4">
+                    <div class="flex gap-4 md:gap-8 items-end">
+                        <div id="spriteRider" class="transform transition-transform duration-200">⚪</div>
+                        <div id="spriteCompanheiro" class="transform transition-transform duration-200 text-4xl hidden opacity-80 mb-2"></div>
+                    </div>
                     <div id="spriteEnemy" class="transform animate-pulse duration-500">🦇</div>
                 </div>
 
@@ -170,11 +170,7 @@
     </div>
 
     <script>
-        // Rastreador de Erros Globais (Impede falhas silenciosas)
-        window.onerror = function(message, source, lineno, colno, error) {
-            mostrarToast(`CRITICAL ERROR: ${message}`, 'bg-red-600 border-white text-white font-bold');
-            return false;
-        };
+        window.onerror = function(message) { mostrarToast(`ERRO: ${message}`, 'bg-red-600 border-white text-white font-bold'); return false; };
 
         function mostrarToast(mensagem, corClasses = 'bg-slate-800 border-slate-600 text-white') {
             const container = document.getElementById('toastContainer');
@@ -211,16 +207,18 @@
         const DB_ATAQUES_POOL = [
             { nome: 'Combo Relâmpago', custo: 3, dano: 16, desc: 'Ataque elétrico de alta eficiência.' },
             { nome: 'Chute Giratório', custo: 4, dano: 22, desc: 'Golpe de rotação que desestabiliza o alvo.' },
-            { nome: 'Golpe Esmagador', custo: 5, dano: 32, desc: 'Pesado e violento. Destrói defesas orgânicas.' },
+            { nome: 'Golpe Esmagador', custo: 5, dano: 32, desc: 'Pesado e violento. Destrói defesas.' },
             { nome: 'Sequência Feroz', custo: 3, dano: 18, desc: 'Série rápida de estocadas frontais.' },
             { nome: 'Impacto Direto', custo: 6, dano: 45, desc: 'Canalização concentrada de energia.' }
         ];
 
-        const DB_COMPANHEIROS_POOL = [
-            { id: 'g3', name: 'Kamen Rider G3', sprite: '🔵', hp: 80, maxHp: 80, sp: 6, maxSp: 6, ataques: [ { nome: 'GM-01 Trigger', custo: 2, dano: 14 }, { nome: 'GG-02 Salamander', custo: 4, dano: 28 } ], desc: 'Guerreiro de armadura mecânica tática.' },
-            { id: 'agito', name: 'Kamen Rider Agito', sprite: '🟡', hp: 90, maxHp: 90, sp: 8, maxSp: 8, ataques: [ { nome: 'Agito Punch', custo: 3, dano: 18 }, { nome: 'Rider Kick', custo: 6, dano: 42 } ], desc: 'Rider ancestral movido pela força desperta.' },
-            { id: 'gills', name: 'Kamen Rider Gills', sprite: '🟢', hp: 110, maxHp: 110, sp: 5, maxSp: 5, ataques: [ { nome: 'Gills Claw', custo: 2, dano: 15 }, { nome: 'Gills Heel Claw', custo: 4, dano: 30 } ], desc: 'Força mutante biológica agressiva.' }
-        ];
+        // FIX LORE 2: Companheiros atrelados à série específica!
+        const DB_COMPANHEIROS = {
+            kuuga: [
+                { id: 'ichijo', name: 'Inspetor Ichijo', sprite: '👮', hp: 45, maxHp: 45, sp: 6, maxSp: 6, ataques: [ { nome: 'Tiro de Precisão (Gás)', custo: 2, dano: 15 }, { nome: 'Fuzil Sniper', custo: 4, dano: 30 } ], desc: 'Suporte tático armado da polícia.' },
+                { id: 'gouram', name: 'Gouram', sprite: '🪲', hp: 120, maxHp: 120, sp: 4, maxSp: 4, ataques: [ { nome: 'Investida Metálica', custo: 2, dano: 12 }, { nome: 'Impacto Aéreo', custo: 3, dano: 25 } ], desc: 'Artefato vivo blindado.' }
+            ]
+        };
 
         let runState = { andarAtual: 0, mapa: [], moedas: 0, pocaoCount: 1, rider: null, companheiro: null };
         let battleState = { fase: 'jogador', turno: 1, itemUsado: false, habilidadesUsadas: {}, abaAtual: 'ataques', enemy: null };
@@ -279,9 +277,18 @@
             if (tipo === 'batalha' || tipo === 'chefe') { prepararCombate(tipo); mostrarTela('batalha'); }
             else if (tipo === 'descanso') {
                 runState.rider.hp = Math.min(runState.rider.maxHp, runState.rider.hp + 30);
-                if(runState.companheiro) runState.companheiro.hp = Math.min(runState.companheiro.maxHp, runState.companheiro.hp + 25);
+                if(runState.companheiro) runState.companheiro.hp = Math.min(runState.companheiro.maxHp, runState.companheiro.hp + 30);
                 mostrarToast('Setor Seguro! HP da equipe restaurado.', 'border-emerald-500 bg-slate-800 text-emerald-400'); prosseguirMapa();
-            } else if (tipo === 'companheiro') { abrirCasaCompanheiros(); }
+            } else if (tipo === 'companheiro') { 
+                // FIX LIMITE 3: Trava no limite inicial de 1 aliado
+                if (runState.companheiro) {
+                    runState.companheiro.hp = runState.companheiro.maxHp;
+                    mostrarToast('Equipe cheia! Aliado curado em 100% como bônus.', 'border-emerald-500 bg-emerald-900 text-white');
+                    prosseguirMapa();
+                } else {
+                    abrirCasaCompanheiros(); 
+                }
+            }
             else { mostrarToast(`Terminal [${tipo.toUpperCase()}] em manutenção! +20 Moedas.`, 'border-yellow-500 bg-slate-800'); runState.moedas += 20; prosseguirMapa(); }
         }
 
@@ -295,12 +302,14 @@
 
         // ================= COMPANHEIROS =================
         function abrirCasaCompanheiros() {
-            document.getElementById('txtTituloRecompensa').innerText = "Sinal de Rádio Identificado!";
-            document.getElementById('txtDescricaoDraft').innerText = "> Escolha 1 aliado tático para assinar o protocolo de combate:";
+            document.getElementById('txtTituloRecompensa').innerText = "Sinal de Aliado Detectado!";
+            document.getElementById('txtDescricaoDraft').innerText = "> Escolha 1 suporte tático da sua série:";
             const container = document.getElementById('containerCartasDraft'); container.innerHTML = '';
             
-            const sorteados = [...DB_COMPANHEIROS_POOL].sort(() => 0.5 - Math.random()).slice(0, 3);
-            sorteados.forEach(comp => {
+            // Puxa os suportes compatíveis com o Rider atual
+            const poolCompativel = DB_COMPANHEIROS[runState.rider.id] || [];
+            
+            poolCompativel.forEach(comp => {
                 const btn = document.createElement('button');
                 btn.className = 'ff-menu p-4 hover:border-indigo-400 hover:-translate-y-2 transition-transform text-left cursor-pointer flex flex-col h-full';
                 btn.innerHTML = `
@@ -316,7 +325,7 @@
                 `;
                 btn.onclick = () => {
                     runState.companheiro = JSON.parse(JSON.stringify(comp));
-                    mostrarToast(`${comp.name} acoplado à equipe!`, "border-indigo-500 bg-indigo-950 text-white");
+                    mostrarToast(`Aliado Acoplado! ${comp.name} juntou-se a você.`, "border-indigo-500 bg-indigo-950 text-white");
                     prosseguirMapa();
                 };
                 container.appendChild(btn);
@@ -327,7 +336,7 @@
             mostrarTela('recompensa');
         }
 
-        // ================= COMBATE BLINDADO =================
+        // ================= COMBATE =================
         function log(msg, cor = 'text-slate-300') {
             const p = document.createElement('p'); p.className = `mb-1 ${cor}`; p.innerText = `> ${msg}`;
             const bl = document.getElementById('battleLog'); bl.appendChild(p); bl.scrollTop = bl.scrollHeight;
@@ -336,7 +345,6 @@
         function prepararCombate(tipo) {
             battleState.fase = 'jogador'; battleState.turno = 1; battleState.itemUsado = false; battleState.habilidadesUsadas = {};
             runState.rider.formaAtual = 'growing'; runState.rider.sp = runState.rider.maxSp; runState.rider.buffAtk = 1;
-            
             if(runState.companheiro) runState.companheiro.sp = runState.companheiro.maxSp;
 
             battleState.enemy = { 
@@ -346,7 +354,7 @@
             };
             
             document.getElementById('hudAndar').innerText = runState.andarAtual + 1;
-            document.getElementById('battleLog').innerHTML = ''; // Limpa log antigo para não estourar memória
+            document.getElementById('battleLog').innerHTML = ''; 
             log('Conexão estabelecida. Combate ativo.', 'text-emerald-400');
             
             const boxComp = document.getElementById('hudBoxCompanheiro');
@@ -393,10 +401,15 @@
 
         function mudarAba(novaAba) {
             battleState.abaAtual = novaAba;
-            document.querySelectorAll('#colunaAbasEsquerda .ff-btn').forEach(b => b.classList.remove('active'));
-            const tabBtn = document.getElementById(`tab-${novaAba}`);
-            if (tabBtn) tabBtn.classList.add('active');
+            
+            const btnAtaque = document.getElementById('tab-ataques');
+            const btnHab = document.getElementById('tab-habilidades');
+            const btnItem = document.getElementById('tab-itens');
+            const btnTransf = document.getElementById('tab-formas');
+            const btnPassar = document.getElementById('btnPassarTurno');
 
+            document.querySelectorAll('#colunaAbasEsquerda .ff-btn').forEach(b => b.classList.remove('active'));
+            
             const menuAcoes = document.getElementById('menuAcoes'); menuAcoes.innerHTML = '';
             
             if (battleState.fase === 'vitoria') {
@@ -407,16 +420,23 @@
                 menuAcoes.innerHTML = `<div class="p-4 text-center text-slate-500 font-mono animate-pulse mt-4 uppercase">Aguarde. Turno do Inimigo.</div>`; return;
             }
 
+            // FIX ABAS 1: Desativa as abas irrelevantes no turno do aliado e força aba "ataques"
             if (battleState.fase === 'companheiro') {
-                document.getElementById('btnPassarTurno').innerText = "Passar (Aliado)";
-                menuAcoes.innerHTML = `<div class="text-[11px] font-mono text-indigo-400 mb-2 uppercase font-bold tracking-wider">// Comandos de: ${runState.companheiro.name}</div>`;
+                btnHab.disabled = true; btnItem.disabled = true; btnTransf.disabled = true;
+                btnPassar.innerText = "Passar (Aliado)";
+                btnAtaque.classList.add('active'); // Força visual
+                
+                menuAcoes.innerHTML = `<div class="text-[11px] font-mono text-indigo-400 mb-2 uppercase font-bold tracking-wider">// Arsenal de: ${runState.companheiro.name}</div>`;
                 runState.companheiro.ataques.forEach(a => {
-                    const cb = function() { usarAtaqueCompanheiro(a); };
-                    criarSlotAcao(a.nome, a.custo, false, cb, true); // true indica que é aliado
+                    criarSlotAcao(a.nome, a.custo, false, function() { usarAtaqueCompanheiro(a); }, true);
                 });
                 return;
             } else {
-                document.getElementById('btnPassarTurno').innerText = "Passar Turno";
+                // Devolve as abas ao jogador
+                btnHab.disabled = false; btnItem.disabled = false; btnTransf.disabled = false;
+                btnPassar.innerText = "Passar Turno";
+                const tabBtn = document.getElementById(`tab-${novaAba}`);
+                if (tabBtn) tabBtn.classList.add('active');
             }
 
             const fData = runState.rider.forms[runState.rider.formaAtual];
@@ -433,16 +453,14 @@
             const btn = document.createElement('button'); btn.className = 'ff-btn flex justify-between items-center mb-1 shrink-0';
             if (isAliado) { btn.classList.add('border-l-3', '!border-indigo-500', 'bg-indigo-950/20'); }
             
-            // Verificação rigorosa para garantir que o SP correto é verificado
             const spAtual = isAliado ? runState.companheiro.sp : runState.rider.sp;
             if (spAtual < custo || travadoForcado) btn.disabled = true;
             
             btn.innerHTML = `<span class="truncate pr-2">${isAliado ? '⚔️ ' : ''}${nome}</span> <span class="text-cyan-500 font-bold shrink-0">${custo > 0 ? custo+' SP' : 'Livre'}</span>`;
             
-            // Wrapper seguro no clique
             btn.onclick = function() {
                 if (btn.disabled) return;
-                animarImpacto(isAliado ? 'spriteCompanheiro' : 'spriteRider', 'scale-90'); // Efeito visual no clique
+                animarImpacto(isAliado ? 'spriteCompanheiro' : 'spriteRider', 'scale-90');
                 callbackFn();
             };
             document.getElementById('menuAcoes').appendChild(btn);
@@ -480,7 +498,7 @@
             if (battleState.fase !== 'jogador' || battleState.itemUsado || runState.pocaoCount <= 0 || runState.rider.sp < 2) return;
             battleState.itemUsado = true; runState.rider.sp -= 2; runState.pocaoCount--;
             runState.rider.hp = Math.min(runState.rider.maxHp, runState.rider.hp + 30);
-            log(`Injetado Módulo de Cura ➔ +30 HP estruturais recuperados.`, 'text-emerald-300'); verificarFim();
+            log(`Injetado Módulo de Reparo ➔ +30 HP estruturais recuperados.`, 'text-emerald-300'); verificarFim();
         }
 
         function transformar(novaForma) {
