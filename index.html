@@ -9,13 +9,11 @@
     <meta name="theme-color" content="#0f172a">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         *, *::before, *::after { box-sizing: border-box; user-select: none; }
         body { overflow: hidden; background-color: #0f172a; }
         
-        /* Estilo clássico de menu de RPG (Bordas duplas/gradientes) */
         .ff-menu {
             background: linear-gradient(to bottom right, #1e293b, #0f172a);
             border: 2px solid #334155;
@@ -41,333 +39,434 @@
         }
         .ff-btn:disabled { color: #475569; cursor: not-allowed; }
         
+        /* Layout do Mapa */
+        .map-node {
+            transition: all 0.2s;
+        }
+        .map-node.active:hover { transform: scale(1.15); box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); }
+        .map-node.locked { filter: grayscale(100%) opacity(0.4); cursor: not-allowed; }
+        
         .log-area { scroll-behavior: smooth; }
+        
+        /* Esconde a barra de rolagem mas permite o scroll */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     </style>
 </head>
 <body class="text-slate-100 font-sans h-screen w-screen flex flex-col justify-center items-center p-2 md:p-4">
 
-    <div id="gameContainer" class="w-full max-w-5xl h-full max-h-[700px] flex flex-col overflow-hidden relative">
+    <div id="gameContainer" class="w-full max-w-5xl h-full max-h-[700px] flex flex-col overflow-hidden relative border border-slate-700 rounded-xl bg-slate-900 shadow-2xl">
         
-        <div id="telaBoot" class="flex-1 flex flex-col items-center justify-center p-6 text-center bg-slate-800 rounded-xl border border-slate-700">
-            <h1 class="text-4xl font-black text-emerald-400 uppercase mb-8">KR: Chronicles</h1>
-            <button onclick="iniciarCombate()" class="w-full max-w-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest">
-                Iniciar Combate Teste
+        <div id="telaBoot" class="flex-1 flex flex-col items-center justify-center p-6 text-center">
+            <h1 class="text-4xl font-black text-emerald-400 uppercase mb-8 tracking-widest drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]">KR: Chronicles</h1>
+            <button onclick="iniciarRun()" class="w-full max-w-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest border border-emerald-400">
+                Iniciar Nova Run
             </button>
         </div>
 
-        <div id="telaBatalha" class="hidden flex-1 flex flex-col gap-2">
+        <div id="telaMapa" class="hidden flex-1 flex flex-col">
+            <header class="bg-slate-800 p-4 border-b border-slate-700 flex justify-between items-center z-10 shadow-lg">
+                <h2 class="font-bold text-emerald-400 font-mono tracking-widest uppercase">Setor de Exploração</h2>
+                <div class="text-yellow-400 font-mono text-sm font-bold bg-slate-900 px-3 py-1 rounded border border-slate-700">🪙 Moedas Rider: <span id="hudMoedas">0</span></div>
+            </header>
             
-            <header class="bg-slate-800 border border-slate-700 p-3 rounded flex justify-between items-end shadow">
+            <div class="flex-1 overflow-y-auto flex flex-col-reverse justify-start items-center p-8 gap-12 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGRpdiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojMGYxNzJhO2hlaWdodDoxMDAlO3dpZHRoOjEwMCU7Ij48L2Rpdj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxIiBmaWxsPSIjMzM0MTU1Ii8+PC9zdmc+')] bg-repeat" id="mapContainer">
+                </div>
+        </div>
+
+        <div id="telaRecompensa" class="hidden flex-1 flex flex-col items-center justify-center p-6 bg-slate-900/95 z-20 absolute inset-0">
+            <h2 class="text-3xl font-black text-yellow-400 mb-2 uppercase">Batalha Concluída!</h2>
+            <p class="text-emerald-400 mb-8 font-mono">> Escolha sua recompensa da base de dados:</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-3xl mb-8">
+                <button onclick="coletarRecompensa('ataque')" class="ff-menu p-6 hover:border-emerald-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">⚔️</div>
+                    <h3 class="font-bold text-white mb-2">Novo Ataque</h3>
+                    <p class="text-xs text-slate-400">Adiciona um golpe à Forma Base.</p>
+                </button>
+                <button onclick="coletarRecompensa('maxhp')" class="ff-menu p-6 hover:border-blue-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">❤️</div>
+                    <h3 class="font-bold text-white mb-2">Aprimoramento Core</h3>
+                    <p class="text-xs text-slate-400">Aumenta Vida Máxima em +15.</p>
+                </button>
+                <button onclick="coletarRecompensa('item')" class="ff-menu p-6 hover:border-yellow-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
+                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">💊</div>
+                    <h3 class="font-bold text-white mb-2">Suprimentos</h3>
+                    <p class="text-xs text-slate-400">Ganha 1 Item Consumível aleatório.</p>
+                </button>
+            </div>
+            
+            <button onclick="prosseguirMapa()" class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded text-sm font-bold uppercase tracking-widest text-slate-300">
+                Pular (Skip)
+            </button>
+        </div>
+
+        <div id="telaBatalha" class="hidden flex-1 flex flex-col gap-2 p-2">
+            
+            <header class="bg-slate-800 border border-slate-700 p-3 rounded flex justify-between items-end shadow-lg">
                 <div class="flex-1">
-                    <h2 class="font-bold text-lg text-white tracking-wide" id="hudRiderName">Kuuga (Growing)</h2>
+                    <h2 class="font-bold text-lg text-white tracking-wide" id="hudRiderName">Kuuga</h2>
                     <div class="flex gap-4 mt-1">
                         <div class="w-32">
                             <div class="flex justify-between text-[10px] uppercase font-bold text-red-400"><span>HP</span> <span id="hudHp">100/100</span></div>
-                            <div class="w-full bg-slate-900 h-2 rounded"><div id="barHp" class="bg-red-500 h-2 rounded transition-all duration-300" style="width: 100%"></div></div>
+                            <div class="w-full bg-slate-900 h-2 rounded"><div id="barHp" class="bg-red-500 h-2 rounded transition-all duration-300"></div></div>
                         </div>
                         <div class="w-32">
                             <div class="flex justify-between text-[10px] uppercase font-bold text-cyan-400"><span>Energia</span> <span id="hudSp">10/10</span></div>
-                            <div class="w-full bg-slate-900 h-2 rounded"><div id="barSp" class="bg-cyan-500 h-2 rounded transition-all duration-300" style="width: 100%"></div></div>
+                            <div class="w-full bg-slate-900 h-2 rounded"><div id="barSp" class="bg-cyan-500 h-2 rounded transition-all duration-300"></div></div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="text-right">
-                    <h2 class="font-bold text-lg text-purple-400 tracking-wide" id="hudEnemyName">Grongi Zu-Gooma-Gu</h2>
+                    <h2 class="font-bold text-lg text-purple-400 tracking-wide" id="hudEnemyName">Inimigo</h2>
                     <div class="w-32 ml-auto mt-1">
                         <div class="flex justify-between text-[10px] uppercase font-bold text-purple-300"><span>HP</span> <span id="hudEnemyHp">80/80</span></div>
-                        <div class="w-full bg-slate-900 h-2 rounded"><div id="barEnemyHp" class="bg-purple-500 h-2 rounded transition-all duration-300" style="width: 100%"></div></div>
+                        <div class="w-full bg-slate-900 h-2 rounded"><div id="barEnemyHp" class="bg-purple-500 h-2 rounded transition-all duration-300"></div></div>
                     </div>
                 </div>
             </header>
 
             <div class="flex-1 bg-slate-900 border border-slate-700 rounded relative flex flex-col p-4 overflow-hidden">
-                <div class="absolute top-2 left-2 bg-slate-800 px-2 py-1 rounded text-xs font-mono text-slate-400 border border-slate-700">Turno: <span id="turnCounter">1</span></div>
+                <div class="absolute top-2 left-2 bg-slate-800 px-2 py-1 rounded text-xs font-mono text-slate-400 border border-slate-700 shadow">Andar: <span id="hudAndar" class="text-white font-bold">1</span> | Turno: <span id="turnCounter" class="text-white font-bold">1</span></div>
                 
                 <div class="flex-1 flex justify-between items-center px-10 text-6xl">
-                    <div id="spriteRider" class="transform hover:scale-110 transition-transform cursor-pointer">🏍️</div>
-                    <div id="spriteEnemy" class="transform hover:scale-110 transition-transform animate-pulse">🦇</div>
+                    <div id="spriteRider" class="transform transition-transform">🏍️</div>
+                    <div id="spriteEnemy" class="transform animate-pulse">🦇</div>
                 </div>
 
-                <div id="battleLog" class="h-24 w-full bg-slate-800/80 border border-slate-700 rounded p-2 overflow-y-auto log-area font-mono text-xs mt-4">
+                <div id="battleLog" class="h-24 w-full bg-slate-800/80 border border-slate-700 rounded p-2 overflow-y-auto log-area font-mono text-xs mt-4 shadow-inner">
                     <p class="text-emerald-400">> Batalha Iniciada!</p>
                 </div>
             </div>
 
-            <div class="h-48 flex gap-2">
-                <div class="w-1/3 ff-menu p-2 flex flex-col">
-                    <button onclick="mudarAba('ataques')" id="tab-ataques" class="ff-btn active">Atacar</button>
-                    <button onclick="mudarAba('habilidades')" id="tab-habilidades" class="ff-btn">Habilidades</button>
-                    <button onclick="mudarAba('itens')" id="tab-itens" class="ff-btn flex justify-between">
+            <div class="h-56 flex gap-2">
+                <div class="w-1/3 ff-menu p-2 flex flex-col overflow-y-auto">
+                    <button onclick="mudarAba('ataques')" id="tab-ataques" class="ff-btn active shrink-0">Atacar</button>
+                    <button onclick="mudarAba('habilidades')" id="tab-habilidades" class="ff-btn shrink-0">Habilidades</button>
+                    <button onclick="mudarAba('itens')" id="tab-itens" class="ff-btn flex justify-between shrink-0">
                         <span>Itens</span> <span id="itemStatus" class="text-[10px] text-emerald-400 pt-1">1/1</span>
                     </button>
-                    <button onclick="mudarAba('formas')" id="tab-formas" class="ff-btn">Transformar</button>
+                    <button onclick="mudarAba('formas')" id="tab-formas" class="ff-btn shrink-0">Transformar</button>
                     
-                    <div class="mt-auto pt-2 border-t border-slate-700">
+                    <div class="mt-auto pt-2 border-t border-slate-700 shrink-0">
                         <button onclick="passarTurno()" class="ff-btn !text-yellow-400 hover:!border-yellow-400">Passar Turno</button>
                     </div>
                 </div>
-
-                <div class="w-2/3 ff-menu p-2 overflow-y-auto" id="menuAcoes">
-                    </div>
+                <div class="w-2/3 ff-menu p-2 overflow-y-auto" id="menuAcoes"></div>
             </div>
-
         </div>
+
     </div>
 
     <script>
-        // ================= BANCO DE DADOS LOCAL DO JOGO =================
-        // Estrutura modular: Facilita plugar novos Riders no futuro.
+        // ================= DADOS =================
         const DB_RIDERS = {
             kuuga: {
-                id: 'kuuga',
-                name: 'Kamen Rider Kuuga',
-                baseHp: 100,
-                maxEnergy: 10,
+                id: 'kuuga', name: 'Kamen Rider Kuuga',
+                baseHp: 100, maxEnergy: 10,
                 forms: {
                     growing: {
-                        id: 'growing',
-                        name: 'Growing Form',
-                        sprite: '⚪', // Representação temporária
-                        ataques: [
-                            { nome: 'Soco Fraco', custo: 2, dano: 5, tipo: 'fisico' },
-                            { nome: 'Chute Crescente', custo: 4, dano: 12, tipo: 'fisico' }
-                        ],
-                        habilidades: [
-                            { nome: 'Foco (Recupera SP)', custo: 0, efeito: 'recuperar_sp', valor: 3 }
-                        ]
+                        id: 'growing', name: 'Growing Form', sprite: '⚪',
+                        ataques: [ { nome: 'Soco Fraco', custo: 2, dano: 5 }, { nome: 'Chute', custo: 4, dano: 12 } ],
+                        habilidades: [ { nome: 'Foco (Recupera SP)', custo: 0, efeito: 'recuperar_sp', valor: 3 } ]
                     },
                     mighty: {
-                        id: 'mighty',
-                        name: 'Mighty Form',
-                        sprite: '🔴',
-                        ataques: [
-                            { nome: 'Mighty Punch', custo: 3, dano: 15, tipo: 'fisico' },
-                            { nome: 'Mighty Kick', custo: 8, dano: 35, tipo: 'finisher' }
-                        ],
-                        habilidades: [
-                            { nome: 'Pose de Combate (Buff Atk)', custo: 3, efeito: 'buff_atk', valor: 1.5 }
-                        ]
+                        id: 'mighty', name: 'Mighty Form', sprite: '🔴',
+                        ataques: [ { nome: 'Mighty Punch', custo: 3, dano: 15 }, { nome: 'Mighty Kick', custo: 8, dano: 35 } ],
+                        habilidades: [ { nome: 'Pose (Buff Atk)', custo: 3, efeito: 'buff_atk', valor: 1.5 } ]
                     }
                 }
             }
         };
 
-        const DB_ITENS = [
-            { nome: 'Poção de Vida', custo: 2, efeito: 'cura', valor: 30 },
-            { nome: 'Bateria Reserva', custo: 0, efeito: 'recuperar_sp', valor: 5 }
-        ];
+        const DB_ITENS = [ { nome: 'Poção de Vida', custo: 2, efeito: 'cura', valor: 30 } ];
 
-        // ================= ESTADO DO COMBATE =================
-        let state = {
-            turno: 1,
-            itemUsado: false, // Regra: 1 item por turno
-            abaAtual: 'ataques',
+        // ================= ESTADO GLOBAL DA RUN =================
+        let runState = {
+            andarAtual: 0, // Vai de 0 a 9 (10 andares)
+            mapa: [],
+            moedas: 0,
             rider: {
                 id: 'kuuga',
                 formaAtual: 'growing',
-                hp: 100, maxHp: 100,
-                sp: 10, maxSp: 10,
-                buffAtk: 1
-            },
-            enemy: {
-                name: 'Grongi Zu-Gooma-Gu',
-                hp: 80, maxHp: 80,
-                danoBase: 8
+                hp: 100, maxHp: 100, sp: 10, maxSp: 10, buffAtk: 1
             }
         };
 
-        // DOM Elements
-        const menuAcoes = document.getElementById('menuAcoes');
-        const battleLog = document.getElementById('battleLog');
+        let battleState = {
+            ativa: false, // FIX 2: Trava do combate
+            turno: 1, itemUsado: false, abaAtual: 'ataques',
+            enemy: null
+        };
 
-        // ================= LÓGICA DE INTERFACE =================
-        function iniciarCombate() {
-            document.getElementById('telaBoot').classList.add('hidden');
-            document.getElementById('telaBatalha').classList.remove('hidden');
-            atualizarHUD();
-            mudarAba('ataques');
+        const menusDOM = {
+            boot: document.getElementById('telaBoot'),
+            mapa: document.getElementById('telaMapa'),
+            batalha: document.getElementById('telaBatalha'),
+            recompensa: document.getElementById('telaRecompensa')
+        };
+
+        function mostrarTela(tela) {
+            Object.values(menusDOM).forEach(el => el.classList.add('hidden'));
+            menusDOM[tela].classList.remove('hidden');
         }
 
+        // ================= SISTEMA DE MAPA =================
+        function iniciarRun() {
+            runState.moedas = 0;
+            runState.andarAtual = 0;
+            runState.rider.hp = DB_RIDERS.kuuga.baseHp;
+            runState.rider.maxHp = DB_RIDERS.kuuga.baseHp;
+            gerarMapaAleatorio();
+            renderizarMapa();
+            mostrarTela('mapa');
+        }
+
+        function gerarMapaAleatorio() {
+            runState.mapa = [];
+            for (let i = 0; i < 10; i++) {
+                let opcoesNoAndar = [];
+                // Primeiro e último andar sempre tem 1 opção (Entrada e Chefe)
+                let numOpcoes = (i === 0 || i === 9) ? 1 : Math.floor(Math.random() * 3) + 1; 
+                
+                for(let j = 0; j < numOpcoes; j++) {
+                    let tipo = 'batalha';
+                    let icone = '⚔️'; let cor = 'bg-red-900/80 border-red-500 text-red-100';
+                    
+                    if (i === 9) { tipo = 'chefe'; icone = '☠️'; cor = 'bg-purple-900/90 border-purple-500 scale-125'; }
+                    else if (i > 0 && i < 9) {
+                        let r = Math.random();
+                        if (r < 0.2) { tipo = 'descanso'; icone = '⛺'; cor = 'bg-emerald-900/80 border-emerald-500'; }
+                        else if (r < 0.3) { tipo = 'loja'; icone = '💰'; cor = 'bg-yellow-900/80 border-yellow-500'; }
+                        else if (r < 0.4) { tipo = 'evento'; icone = '❓'; cor = 'bg-blue-900/80 border-blue-500'; }
+                    }
+                    opcoesNoAndar.push({ tipo, icone, cor });
+                }
+                runState.mapa.push(opcoesNoAndar);
+            }
+        }
+
+        function renderizarMapa() {
+            const container = document.getElementById('mapContainer');
+            document.getElementById('hudMoedas').innerText = runState.moedas;
+            container.innerHTML = '';
+
+            runState.mapa.forEach((andar, index) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'flex gap-8 justify-center w-full relative';
+                
+                const isAtivo = index === runState.andarAtual;
+                const isPassado = index < runState.andarAtual;
+
+                andar.forEach(no => {
+                    const btn = document.createElement('button');
+                    // Classes de estilo e estado (bloqueado, ativo, passado)
+                    btn.className = `map-node flex items-center justify-center w-16 h-16 rounded-full border-4 text-2xl shadow-lg ${no.cor} `;
+                    btn.innerHTML = no.icone;
+                    
+                    if (isAtivo) {
+                        btn.classList.add('active', 'animate-pulse', 'cursor-pointer');
+                        btn.onclick = () => entrarNoMapa(no.tipo);
+                    } else if (isPassado) {
+                        btn.classList.add('locked', 'border-slate-500', 'bg-slate-800');
+                        btn.innerHTML = '✔️';
+                    } else {
+                        btn.classList.add('locked');
+                    }
+                    rowDiv.appendChild(btn);
+                });
+                container.appendChild(rowDiv);
+            });
+        }
+
+        function entrarNoMapa(tipo) {
+            if (tipo === 'batalha' || tipo === 'chefe') {
+                prepararCombate(tipo);
+                mostrarTela('batalha');
+            } else if (tipo === 'descanso') {
+                alert("Casa de Descanso! Recuperou 30 HP.");
+                runState.rider.hp = Math.min(runState.rider.maxHp, runState.rider.hp + 30);
+                prosseguirMapa();
+            } else {
+                alert(`Você entrou em um nó de: ${tipo}. Em construção!`);
+                prosseguirMapa();
+            }
+        }
+
+        function prosseguirMapa() {
+            runState.andarAtual++;
+            if (runState.andarAtual >= 10) {
+                alert("FIM DE JOGO! VOCÊ VENCEU A RUN!");
+                mostrarTela('boot');
+            } else {
+                renderizarMapa();
+                mostrarTela('mapa');
+            }
+        }
+
+        // ================= SISTEMA DE COMBATE (FIXADO) =================
+        function prepararCombate(tipo) {
+            battleState.ativa = true; // Libera os botões
+            battleState.turno = 1;
+            battleState.itemUsado = false;
+            runState.rider.formaAtual = 'growing'; // Reseta a forma
+            runState.rider.sp = runState.rider.maxSp;
+            
+            battleState.enemy = { 
+                name: tipo === 'chefe' ? 'Boss Grongi' : 'Grongi Aleatório', 
+                hp: tipo === 'chefe' ? 150 : 50 + (runState.andarAtual * 5), 
+                maxHp: tipo === 'chefe' ? 150 : 50 + (runState.andarAtual * 5), 
+                danoBase: tipo === 'chefe' ? 15 : 6 
+            };
+            
+            document.getElementById('hudAndar').innerText = runState.andarAtual + 1;
+            document.getElementById('battleLog').innerHTML = '<p class="text-emerald-400">> Batalha Iniciada!</p>';
+            atualizarHUD(); mudarAba('ataques');
+        }
+
+        // FIX 2: Adicionado validação "if(!battleState.ativa) return;" em todas as ações
         function log(msg, cor = 'text-slate-300') {
-            const p = document.createElement('p');
-            p.className = `mb-1 ${cor}`;
-            p.innerText = `> ${msg}`;
-            battleLog.appendChild(p);
-            battleLog.scrollTop = battleLog.scrollHeight;
+            const p = document.createElement('p'); p.className = `mb-1 ${cor}`; p.innerText = `> ${msg}`;
+            const bl = document.getElementById('battleLog'); bl.appendChild(p); bl.scrollTop = bl.scrollHeight;
         }
 
         function atualizarHUD() {
-            const rData = DB_RIDERS[state.rider.id];
-            const fData = rData.forms[state.rider.formaAtual];
-
-            // Textos
+            const rData = DB_RIDERS[runState.rider.id]; const fData = rData.forms[runState.rider.formaAtual];
             document.getElementById('hudRiderName').innerText = `${rData.name} (${fData.name})`;
-            document.getElementById('hudHp').innerText = `${state.rider.hp}/${state.rider.maxHp}`;
-            document.getElementById('hudSp').innerText = `${state.rider.sp}/${state.rider.maxSp}`;
-            document.getElementById('hudEnemyHp').innerText = `${state.enemy.hp}/${state.enemy.maxHp}`;
-            document.getElementById('turnCounter').innerText = state.turno;
+            document.getElementById('hudHp').innerText = `${runState.rider.hp}/${runState.rider.maxHp}`;
+            document.getElementById('hudSp').innerText = `${runState.rider.sp}/${runState.rider.maxSp}`;
+            document.getElementById('hudEnemyHp').innerText = `${battleState.enemy.hp}/${battleState.enemy.maxHp}`;
+            document.getElementById('turnCounter').innerText = battleState.turno;
             document.getElementById('spriteRider').innerText = fData.sprite;
-
-            // Barras
-            document.getElementById('barHp').style.width = `${Math.max(0, (state.rider.hp / state.rider.maxHp) * 100)}%`;
-            document.getElementById('barSp').style.width = `${Math.max(0, (state.rider.sp / state.rider.maxSp) * 100)}%`;
-            document.getElementById('barEnemyHp').style.width = `${Math.max(0, (state.enemy.hp / state.enemy.maxHp) * 100)}%`;
-
-            // Status do Item
-            const itemBtn = document.getElementById('itemStatus');
-            if(state.itemUsado) {
-                itemBtn.innerText = "0/1"; itemBtn.classList.replace('text-emerald-400', 'text-red-400');
-            } else {
-                itemBtn.innerText = "1/1"; itemBtn.classList.replace('text-red-400', 'text-emerald-400');
-            }
+            document.getElementById('barHp').style.width = `${Math.max(0, (runState.rider.hp / runState.rider.maxHp) * 100)}%`;
+            document.getElementById('barSp').style.width = `${Math.max(0, (runState.rider.sp / runState.rider.maxSp) * 100)}%`;
+            document.getElementById('barEnemyHp').style.width = `${Math.max(0, (battleState.enemy.hp / battleState.enemy.maxHp) * 100)}%`;
+            
+            const ib = document.getElementById('itemStatus');
+            ib.innerText = battleState.itemUsado ? "0/1" : "1/1";
+            ib.className = `text-[10px] pt-1 ${battleState.itemUsado ? 'text-red-400' : 'text-emerald-400'}`;
         }
 
         function mudarAba(novaAba) {
-            state.abaAtual = novaAba;
-            
-            // Controle visual das categorias
-            document.querySelectorAll('.ff-menu .ff-btn').forEach(btn => btn.classList.remove('active'));
+            battleState.abaAtual = novaAba;
+            document.querySelectorAll('.ff-menu .ff-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`tab-${novaAba}`).classList.add('active');
 
-            menuAcoes.innerHTML = ''; // Limpa slots
-            const fData = DB_RIDERS[state.rider.id].forms[state.rider.formaAtual];
-
-            // Renderiza os slots baseados na aba
-            if (novaAba === 'ataques') {
-                fData.ataques.forEach(atk => criarSlotAcao(atk.nome, atk.custo, () => usarAtaque(atk)));
-            } 
-            else if (novaAba === 'habilidades') {
-                fData.habilidades.forEach(hab => criarSlotAcao(hab.nome, hab.custo, () => usarHabilidade(hab)));
-            } 
-            else if (novaAba === 'itens') {
-                DB_ITENS.forEach(item => {
-                    const btn = criarSlotAcao(item.nome, item.custo, () => usarItem(item));
-                    if(state.itemUsado) btn.disabled = true; // Trava se já usou na rodada
-                });
-            } 
-            else if (novaAba === 'formas') {
-                Object.values(DB_RIDERS[state.rider.id].forms).forEach(forma => {
-                    if(forma.id !== state.rider.formaAtual) {
-                        criarSlotAcao(`Transformar: ${forma.name}`, 3, () => transformar(forma.id));
-                    }
-                });
+            const menuAcoes = document.getElementById('menuAcoes');
+            menuAcoes.innerHTML = '';
+            
+            // Se a batalha acabou, exibe botão de continuar e ignora o resto
+            if (!battleState.ativa) {
+                if(runState.rider.hp > 0) {
+                    menuAcoes.innerHTML = `<button onclick="vencerCombate()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest animate-bounce mt-4">Coletar Recompensa</button>`;
+                } else {
+                    menuAcoes.innerHTML = `<button onclick="mostrarTela('boot')" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Fim de Jogo</button>`;
+                }
+                return;
             }
+
+            const fData = DB_RIDERS[runState.rider.id].forms[runState.rider.formaAtual];
+
+            if (novaAba === 'ataques') fData.ataques.forEach(a => criarSlotAcao(a.nome, a.custo, () => usarAtaque(a)));
+            else if (novaAba === 'habilidades') fData.habilidades.forEach(h => criarSlotAcao(h.nome, h.custo, () => usarHabilidade(h)));
+            else if (novaAba === 'itens') DB_ITENS.forEach(i => { let b = criarSlotAcao(i.nome, i.custo, () => usarItem(i)); if(battleState.itemUsado) b.disabled = true; });
+            else if (novaAba === 'formas') Object.values(DB_RIDERS[runState.rider.id].forms).forEach(f => { if(f.id !== runState.rider.formaAtual) criarSlotAcao(`Form: ${f.name}`, 3, () => transformar(f.id)); });
         }
 
-        function criarSlotAcao(nome, custo, callback) {
-            const btn = document.createElement('button');
-            btn.className = 'ff-btn flex justify-between mb-1';
-            // Trava botão se não tiver energia suficiente
-            if (state.rider.sp < custo) btn.disabled = true;
-            
+        function criarSlotAcao(nome, custo, cb) {
+            const btn = document.createElement('button'); btn.className = 'ff-btn flex justify-between mb-1 shrink-0';
+            if (runState.rider.sp < custo) btn.disabled = true;
             btn.innerHTML = `<span>${nome}</span> <span class="text-cyan-500 font-bold">${custo > 0 ? custo+' SP' : 'Livre'}</span>`;
-            btn.onclick = callback;
-            menuAcoes.appendChild(btn);
-            return btn;
+            btn.onclick = cb; document.getElementById('menuAcoes').appendChild(btn); return btn;
         }
 
-        // ================= MECÂNICAS DE AÇÃO =================
         function usarAtaque(atk) {
-            if (state.rider.sp < atk.custo) return;
-            
-            state.rider.sp -= atk.custo;
-            const danoFinal = Math.floor(atk.dano * state.rider.buffAtk);
-            state.enemy.hp -= danoFinal;
-            state.rider.buffAtk = 1; // Reseta buff após atacar
-            
-            log(`Você usou [${atk.nome}] causando ${danoFinal} de dano!`, 'text-white');
-            animarAcao('spriteRider');
-            verificarEstadoBatalha();
+            if (!battleState.ativa || runState.rider.sp < atk.custo) return;
+            runState.rider.sp -= atk.custo;
+            const d = Math.floor(atk.dano * runState.rider.buffAtk);
+            battleState.enemy.hp -= d; runState.rider.buffAtk = 1;
+            log(`Usou [${atk.nome}] causando ${d} de dano!`); verificarFim();
         }
 
         function usarHabilidade(hab) {
-            if (state.rider.sp < hab.custo) return;
-            state.rider.sp -= hab.custo;
-
-            if (hab.efeito === 'recuperar_sp') {
-                state.rider.sp = Math.min(state.rider.maxSp, state.rider.sp + hab.valor);
-                log(`Foco! Você recuperou ${hab.valor} de Energia.`, 'text-cyan-300');
-            } else if (hab.efeito === 'buff_atk') {
-                state.rider.buffAtk = hab.valor;
-                log(`Seu próximo ataque causará mais dano!`, 'text-orange-300');
-            }
-            atualizarHUD(); mudarAba(state.abaAtual);
+            if (!battleState.ativa || runState.rider.sp < hab.custo) return;
+            runState.rider.sp -= hab.custo;
+            if(hab.efeito==='recuperar_sp') { runState.rider.sp = Math.min(runState.rider.maxSp, runState.rider.sp+hab.valor); log(`Recuperou ${hab.valor} SP.`, 'text-cyan-300'); }
+            else if(hab.efeito==='buff_atk') { runState.rider.buffAtk = hab.valor; log(`Ataque Buffado!`, 'text-orange-300'); }
+            verificarFim();
         }
 
         function usarItem(item) {
-            if (state.itemUsado || state.rider.sp < item.custo) return;
-            state.itemUsado = true;
-            state.rider.sp -= item.custo;
-
-            if (item.efeito === 'cura') {
-                state.rider.hp = Math.min(state.rider.maxHp, state.rider.hp + item.valor);
-                log(`Usou [${item.nome}]. Curou ${item.valor} HP.`, 'text-emerald-300');
-            } else if (item.efeito === 'recuperar_sp') {
-                state.rider.sp = Math.min(state.rider.maxSp, state.rider.sp + item.valor);
-                log(`Usou [${item.nome}]. Ganhou energia extra.`, 'text-cyan-300');
-            }
-            atualizarHUD(); mudarAba(state.abaAtual); // Re-renderiza abas para travar os itens
+            if (!battleState.ativa || battleState.itemUsado || runState.rider.sp < item.custo) return;
+            battleState.itemUsado = true; runState.rider.sp -= item.custo;
+            if(item.efeito==='cura') { runState.rider.hp = Math.min(runState.rider.maxHp, runState.rider.hp+item.valor); log(`Curou ${item.valor} HP.`, 'text-emerald-300'); }
+            verificarFim();
         }
 
-        function transformar(novaFormaId) {
-            const custoTransformacao = 3; // Regra global de transformação
-            if (state.rider.sp < custoTransformacao) return;
-            
-            state.rider.sp -= custoTransformacao;
-            state.rider.formaAtual = novaFormaId;
-            const nomeNovaForma = DB_RIDERS[state.rider.id].forms[novaFormaId].name;
-            
-            log(`HENSHIN! Mudou para ${nomeNovaForma}!`, 'text-yellow-400 font-bold');
-            animarAcao('spriteRider', 'scale-150');
-            atualizarHUD(); mudarAba('ataques'); // Força ir para aba de ataques da nova forma
+        function transformar(novaForma) {
+            if (!battleState.ativa || runState.rider.sp < 3) return;
+            runState.rider.sp -= 3; runState.rider.formaAtual = novaForma;
+            log(`HENSHIN! ${DB_RIDERS[runState.rider.id].forms[novaForma].name}!`, 'text-yellow-400 font-bold');
+            atualizarHUD(); mudarAba('ataques');
         }
 
         function passarTurno() {
+            if (!battleState.ativa) return;
             log('Fim do seu turno.', 'text-slate-500');
+            battleState.ativa = false; // Trava inputs do jogador
             
-            // Turno do inimigo simulado
             setTimeout(() => {
-                if(state.enemy.hp > 0) {
-                    const danoSofrido = state.enemy.danoBase + Math.floor(Math.random() * 4);
-                    state.rider.hp -= danoSofrido;
-                    log(`Inimigo atacou e causou ${danoSofrido} de dano!`, 'text-red-400');
-                    animarAcao('spriteEnemy');
+                if(battleState.enemy.hp > 0) {
+                    const d = battleState.enemy.danoBase + Math.floor(Math.random() * 4);
+                    runState.rider.hp -= d; log(`Inimigo atacou e causou ${d} dano!`, 'text-red-400');
                 }
-                
-                // Reseta a rodada para o jogador
                 setTimeout(() => {
-                    state.turno++;
-                    state.rider.sp = state.rider.maxSp; // Reseta energia (Action Points)
-                    state.itemUsado = false; // Reseta limite de itens
-                    log(`-- Início do Turno ${state.turno} --`, 'text-emerald-500 mt-2');
-                    verificarEstadoBatalha();
+                    verificarFim(); // Verifica se o rider morreu no ataque
+                    if(battleState.enemy.hp > 0 && runState.rider.hp > 0) {
+                        battleState.turno++; runState.rider.sp = runState.rider.maxSp; battleState.itemUsado = false;
+                        battleState.ativa = true; // Libera inputs do jogador
+                        log(`-- Início do Turno ${battleState.turno} --`, 'text-emerald-500 mt-2');
+                        atualizarHUD(); mudarAba(battleState.abaAtual);
+                    }
                 }, 1000);
-
             }, 800);
         }
 
-        function verificarEstadoBatalha() {
-            atualizarHUD();
-            mudarAba(state.abaAtual); // Atualiza os menus dinamicamente (botões ativam/desativam baseado no SP)
-
-            if (state.enemy.hp <= 0) {
-                log('Você derrotou o monstro! Fim da simulação.', 'text-yellow-400 font-bold text-lg');
-                menuAcoes.innerHTML = '<div class="p-2 text-center text-emerald-400">VITÓRIA!</div>';
-                // No futuro aqui ativamos a Tela de Recompensa
-            } else if (state.rider.hp <= 0) {
-                log('Você foi derrotado. GAME OVER.', 'text-red-500 font-bold text-lg');
-                menuAcoes.innerHTML = '<div class="p-2 text-center text-red-500">DERROTA!</div>';
+        function verificarFim() {
+            atualizarHUD(); mudarAba(battleState.abaAtual);
+            if (battleState.enemy.hp <= 0) {
+                battleState.ativa = false;
+                log('VITÓRIA!', 'text-yellow-400 font-bold text-lg');
+                mudarAba('ataques'); // Força a renderização do botão de continuar
+            } else if (runState.rider.hp <= 0) {
+                battleState.ativa = false;
+                log('GAME OVER.', 'text-red-500 font-bold text-lg');
+                mudarAba('ataques');
             }
         }
 
-        // Função auxiliar para dar um pequeno efeito visual no DOM
-        function animarAcao(elementId, fx = 'scale-125') {
-            const el = document.getElementById(elementId);
-            el.classList.add(fx);
-            setTimeout(() => el.classList.remove(fx), 200);
+        // ================= SISTEMA DE RECOMPENSA =================
+        function vencerCombate() {
+            const moedasGanhas = 15 + Math.floor(Math.random() * 10);
+            runState.moedas += moedasGanhas;
+            document.getElementById('hudMoedas').innerText = runState.moedas;
+            mostrarTela('recompensa');
         }
 
+        function coletarRecompensa(tipo) {
+            if(tipo === 'maxhp') {
+                runState.rider.maxHp += 15;
+                runState.rider.hp += 15;
+                alert("HP Máximo aumentado!");
+            } else if (tipo === 'ataque') {
+                alert("Nesta versão mock, você aprendeu um golpe! (Lógica de inventário em breve)");
+            } else {
+                alert("Você ganhou 1 Poção extra!");
+            }
+            prosseguirMapa();
+        }
     </script>
 </body>
 </html>
