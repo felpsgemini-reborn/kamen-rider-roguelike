@@ -28,6 +28,9 @@
             border-left: 3px solid #10b981; padding-left: 16px;
         }
         .ff-btn:disabled { color: #475569; cursor: not-allowed; }
+        .ff-btn:active:not(:disabled) {
+            transform: scale(0.98); background: rgba(16, 185, 129, 0.2);
+        }
         
         .map-node { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .map-node.active:hover { transform: scale(1.15); box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); }
@@ -50,7 +53,7 @@
         
         <div id="telaBoot" class="flex-1 flex flex-col items-center justify-center p-6 text-center">
             <h1 class="text-4xl font-black text-emerald-400 uppercase mb-8 tracking-widest drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]">KR: Chronicles</h1>
-            <button onclick="iniciarRun()" class="w-full max-w-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest border border-emerald-400">
+            <button onclick="iniciarRun()" class="w-full max-w-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest border border-emerald-400 transition-transform active:scale-95">
                 Iniciar Nova Run
             </button>
         </div>
@@ -72,7 +75,7 @@
                     <button onclick="prepararDraftAtaque()" class="ff-menu p-4 md:p-6 hover:border-emerald-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
                         <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">⚔️</div>
                         <h3 class="font-bold text-white mb-2 text-sm md:text-base">Análise de Combate</h3>
-                        <p class="text-[10px] md:text-xs text-slate-400">Extraia 1 novo ataque de uma pool de 3 opções aleatórias.</p>
+                        <p class="text-[10px] md:text-xs text-slate-400">Escolha 1 ataque aleatório previamente vinculado a uma forma.</p>
                     </button>
                     <button onclick="coletarRecompensaDireta('maxhp')" class="ff-menu p-4 md:p-6 hover:border-blue-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
                         <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">❤️</div>
@@ -89,18 +92,9 @@
             </div>
 
             <div id="recDraft" class="hidden w-full max-w-3xl flex flex-col items-center">
-                <p class="text-emerald-400 mb-8 font-mono text-sm md:text-base text-center">> Selecione 1 Modificador de Ataque:</p>
+                <p class="text-emerald-400 mb-8 font-mono text-sm md:text-base text-center">> Selecione 1 Modificador de Ataque Estratégico:</p>
                 <div id="containerCartasDraft" class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mb-8"></div>
                 <button onclick="voltarCategorias()" class="text-slate-400 hover:text-white px-6 py-2 text-xs font-mono uppercase tracking-widest border-b border-slate-700 hover:border-white transition-colors">Voltar</button>
-            </div>
-
-            <div id="recAlocacao" class="hidden w-full max-w-md flex flex-col items-center ff-menu p-6">
-                <h3 class="font-bold text-xl text-white mb-2 uppercase text-center tracking-wide">Vincular Habilidade</h3>
-                <p class="text-xs font-mono text-cyan-400 mb-6 text-center" id="txtAtaqueSelecionado">Ataque: X</p>
-                <p class="text-sm text-slate-400 mb-6 text-center">Selecione em qual arquivo de transformação você deseja carregar essa técnica:</p>
-                
-                <div id="containerBotoesFormas" class="w-full flex flex-col gap-2 mb-4">
-                    </div>
             </div>
         </div>
 
@@ -158,18 +152,20 @@
     </div>
 
     <script>
+        // Correção do Bug Silencioso do Toast
         function mostrarToast(mensagem, corClasses = 'bg-slate-800 border-slate-600 text-white') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = `toast-enter p-3 rounded shadow-xl border-l-4 font-mono text-xs md:text-sm ${corClasses}`;
-            toast.innerHTML = message = mensagem; container.appendChild(toast);
+            toast.innerHTML = mensagem; // Corrigido aqui
+            container.appendChild(toast);
             setTimeout(() => {
                 toast.classList.replace('toast-enter', 'opacity-0'); toast.style.transition = 'all 0.3s';
                 toast.style.transform = 'translateX(100%)'; setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
 
-        // ================= DATA =================
+        // ================= DADOS BASE =================
         const DB_RIDERS = {
             kuuga: {
                 id: 'kuuga', name: 'Kamen Rider Kuuga', baseHp: 100, maxEnergy: 10,
@@ -199,14 +195,10 @@
         let runState = { andarAtual: 0, mapa: [], moedas: 0, pocaoCount: 1, rider: null };
         let battleState = { fase: 'jogador', turno: 1, itemUsado: false, habilidadesUsadas: {}, abaAtual: 'ataques', enemy: null };
         
-        // Cache tático para armazenar a carta escolhida temporariamente antes de saber a forma
-        let cartaSelecionadaTemporaria = null;
-
         const menusDOM = { boot: document.getElementById('telaBoot'), mapa: document.getElementById('telaMapa'), batalha: document.getElementById('telaBatalha'), recompensa: document.getElementById('telaRecompensa') };
         function mostrarTela(tela) { Object.values(menusDOM).forEach(el => el.classList.add('hidden')); menusDOM[tela].classList.remove('hidden'); }
 
         // ================= MAPA =================
-        // ... (Mesma lógica estável de geração e movimentação do mapa)
         function iniciarRun() {
             runState.moedas = 0; runState.andarAtual = 0; runState.pocaoCount = 1;
             runState.rider = JSON.parse(JSON.stringify(DB_RIDERS.kuuga));
@@ -257,9 +249,9 @@
             if (tipo === 'batalha' || tipo === 'chefe') { prepararCombate(tipo); mostrarTela('batalha'); }
             else if (tipo === 'descanso') {
                 runState.rider.hp = Math.min(runState.rider.maxHp, runState.rider.hp + 30);
-                mostrarToast('Setor Segurado! +30 HP restaurados.', 'border-emerald-500 bg-slate-800 text-emerald-400'); prosseguirMapa();
+                mostrarToast('Setor Seguro! +30 HP restaurados.', 'border-emerald-500 bg-slate-800 text-emerald-400'); prosseguirMapa();
             } else {
-                mostrarToast(`Terminal de rede [${tipo.toUpperCase()}] em manutenção! Coletado 15 Moedas.`, 'border-yellow-500 bg-slate-800'); runState.moedas += 15; prosseguirMapa();
+                mostrarToast(`Nó de ${tipo.toUpperCase()} em testes! Coletado 15 Moedas.`, 'border-yellow-500 bg-slate-800'); runState.moedas += 15; prosseguirMapa();
             }
         }
 
@@ -272,6 +264,11 @@
         }
 
         // ================= COMBATE =================
+        function log(msg, cor = 'text-slate-300') {
+            const p = document.createElement('p'); p.className = `mb-1 ${cor}`; p.innerText = `> ${msg}`;
+            const bl = document.getElementById('battleLog'); bl.appendChild(p); bl.scrollTop = bl.scrollHeight;
+        }
+
         function prepararCombate(tipo) {
             battleState.fase = 'jogador'; battleState.turno = 1; battleState.itemUsado = false; battleState.habilidadesUsadas = {};
             runState.rider.formaAtual = 'growing'; runState.rider.sp = runState.rider.maxSp;
@@ -312,7 +309,7 @@
             } else if (battleState.fase === 'derrota') {
                 menuAcoes.innerHTML = `<button onclick="mostrarTela('boot')" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Retornar ao Menu</button>`; return;
             } else if (battleState.fase === 'inimigo') {
-                menuAcoes.innerHTML = `<div class="p-4 text-center text-slate-500 font-mono animate-pulse mt-4 uppercase">Processando resposta do inimigo...</div>`; return;
+                menuAcoes.innerHTML = `<div class="p-4 text-center text-slate-500 font-mono animate-pulse mt-4 uppercase">Processando turno inimigo...</div>`; return;
             }
 
             const fData = runState.rider.forms[runState.rider.formaAtual];
@@ -320,9 +317,9 @@
             if (novaAba === 'ataques') fData.ataques.forEach(a => criarSlotAcao(a.nome, a.custo, false, () => usarAtaque(a)));
             else if (novaAba === 'habilidades') fData.habilidades.forEach(h => {
                 let travado = (battleState.habilidadesUsadas[h.nome] || 0) >= h.usoPorTurno;
-                criarSlotAcao(h.nome + (travado ? ' [X]' : ''), h.custo, travado, () => usarHabilidade(h));
+                criarSlotAcao(h.nome + (travado ? ' [Esgotado]' : ''), h.custo, travado, () => usarHabilidade(h));
             });
-            else if (novaAba === 'itens') criarSlotAcao(`Módulo de Reparo (Restam: ${runState.pocaoCount})`, 2, (battleState.itemUsado || runState.pocaoCount <= 0), () => usarItem());
+            else if (novaAba === 'itens') criarSlotAcao(`Módulo de Cura`, 2, (battleState.itemUsado || runState.pocaoCount <= 0), () => usarItem());
             else if (novaAba === 'formas') Object.values(runState.rider.forms).forEach(f => { if(f.id !== runState.rider.formaAtual) criarSlotAcao(`Henshin: ${f.name}`, 3, false, () => transformar(f.id)); });
         }
 
@@ -353,13 +350,13 @@
             if (battleState.fase !== 'jogador' || battleState.itemUsado || runState.pocaoCount <= 0 || runState.rider.sp < 2) return;
             battleState.itemUsado = true; runState.rider.sp -= 2; runState.pocaoCount--;
             runState.rider.hp = Math.min(runState.rider.maxHp, runState.rider.hp + 30);
-            log(`Injetou Módulo de Reparo -> Integridade +30 HP.`, 'text-emerald-300'); verificarFim();
+            log(`Injetou Módulo de Cura -> +30 HP.`, 'text-emerald-300'); verificarFim();
         }
 
         function transformar(novaForma) {
             if (battleState.fase !== 'jogador' || runState.rider.sp < 3) return;
             runState.rider.sp -= 3; runState.rider.formaAtual = novaForma;
-            log(`HENSHIN UNLOCKED: Alterando para ${runState.rider.forms[novaForma].name}.`, 'text-yellow-400 font-bold');
+            log(`HENSHIN! Alterando para ${runState.rider.forms[novaForma].name}.`, 'text-yellow-400 font-bold');
             atualizarHUD(); mudarAba('ataques');
         }
 
@@ -389,7 +386,7 @@
             atualizarHUD(); mudarAba(battleState.abaAtual);
         }
 
-        // ================= DRAFT COM EXCLUSIVIDADE DE FORMA (SUA IDEIA) =================
+        // ================= DRAFT (GAME DESIGN NOVO) =================
         function vencerCombate() {
             const ganho = 15 + Math.floor(Math.random() * 10); runState.moedas += ganho;
             document.getElementById('hudMoedas').innerText = runState.moedas;
@@ -398,40 +395,47 @@
 
         function coletarRecompensaDireta(tipo) {
             if(tipo === 'maxhp') { runState.rider.maxHp += 15; runState.rider.hp += 15; mostrarToast("Core Expandido: +15 Max HP.", "border-blue-500 bg-blue-900 text-white"); } 
-            else if (tipo === 'item') { runState.pocaoCount++; mostrarToast("Módulo de Reparo adicionado.", "border-yellow-500 bg-slate-800 text-yellow-400"); }
+            else if (tipo === 'item') { runState.pocaoCount++; mostrarToast("Módulo de Cura adicionado.", "border-yellow-500 bg-slate-800 text-yellow-400"); }
             prosseguirMapa();
         }
 
         function prepararDraftAtaque() {
-            // Unifica todos os ataques que o Rider já tem em QUALQUER uma das formas para evitar duplicatas globais na run
-            const ataquesExistentes = [];
-            Object.values(runState.rider.forms).forEach(f => {
-                f.ataques.forEach(a => ataquesExistentes.push(a.nome));
-            });
+            const formasDisponiveis = Object.values(runState.rider.forms);
+            const poolEmbaralhada = [...DB_ATAQUES_POOL].sort(() => 0.5 - Math.random());
+            const opcoesDraft = [];
 
-            const disponiveis = DB_ATAQUES_POOL.filter(a => !ataquesExistentes.includes(a.nome));
-            
-            if (disponiveis.length === 0) {
-                mostrarToast("Banco de dados esgotado! Ganhou 40 Moedas.", "border-yellow-500 bg-yellow-900 text-white");
-                runState.moedas += 40; prosseguirMapa(); return;
+            // Pega 3 ataques e sorteia uma forma aleatória para cada carta
+            for(let i=0; i<3; i++) {
+                if(!poolEmbaralhada[i]) break; // Previne erro caso a pool seja menor que 3 no futuro
+                const formaSorteada = formasDisponiveis[Math.floor(Math.random() * formasDisponiveis.length)];
+                opcoesDraft.push({ ataque: poolEmbaralhada[i], forma: formaSorteada });
             }
 
-            const opcoes = disponiveis.sort(() => 0.5 - Math.random()).slice(0, 3);
             const container = document.getElementById('containerCartasDraft'); container.innerHTML = '';
             
-            opcoes.forEach(atk => {
+            opcoesDraft.forEach(opcao => {
                 const btn = document.createElement('button');
                 btn.className = 'ff-menu p-4 hover:border-emerald-400 hover:-translate-y-2 transition-transform text-left cursor-pointer flex flex-col h-full';
                 btn.innerHTML = `
                     <div class="flex justify-between items-start mb-2 border-b border-slate-700 pb-2 w-full">
-                        <h3 class="font-bold text-white text-sm md:text-base">${atk.nome}</h3>
-                        <span class="text-cyan-400 font-bold text-xs bg-slate-800 px-2 py-1 rounded border border-slate-700">${atk.custo} SP</span>
+                        <h3 class="font-bold text-white text-sm md:text-base">${opcao.ataque.nome}</h3>
+                        <span class="text-cyan-400 font-bold text-xs bg-slate-800 px-2 py-1 rounded border border-slate-700">${opcao.ataque.custo} SP</span>
                     </div>
-                    <div class="text-red-400 font-mono text-xs mb-2">Dano Líquido: ${atk.dano}</div>
-                    <p class="text-[10px] md:text-xs text-slate-400 italic mt-auto">${atk.desc}</p>
+                    <div class="text-red-400 font-mono text-xs mb-2">Dano Líquido: ${opcao.ataque.dano}</div>
+                    
+                    <div class="mb-3 inline-block bg-indigo-900/50 border border-indigo-500 text-indigo-300 font-bold px-2 py-1 text-[10px] rounded uppercase tracking-wider">
+                        Vincular a: ${opcao.forma.name}
+                    </div>
+
+                    <p class="text-[10px] md:text-xs text-slate-400 italic mt-auto">${opcao.ataque.desc}</p>
                 `;
-                // Ao clicar na carta, salva temporariamente e abre a tela de alocação de forma (sua ideia!)
-                btn.onclick = () => abrirEscolhaDeForma(atk);
+                btn.onclick = () => {
+                    // Adiciona o ataque exatamente na forma que estava na carta
+                    runState.rider.forms[opcao.forma.id].ataques.push(opcao.ataque);
+                    mostrarToast(`Instalado: ${opcao.ataque.nome} na ${opcao.forma.name}!`, "border-emerald-500 bg-emerald-900 text-white");
+                    document.getElementById('recDraft').classList.add('hidden');
+                    prosseguirMapa();
+                };
                 container.appendChild(btn);
             });
 
@@ -439,36 +443,8 @@
             document.getElementById('recDraft').classList.remove('hidden');
         }
 
-        function abrirEscolhaDeForma(atk) {
-            cartaSelecionadaTemporaria = atk;
-            document.getElementById('txtAtaqueSelecionado').innerText = `Técnica Selecionada: ${atk.nome} (${atk.custo} SP)`;
-            
-            const containerFormas = document.getElementById('containerBotoesFormas');
-            containerFormas.innerHTML = '';
-            
-            // Cria um botão para cada forma que o Rider tem no inventário clonado da run
-            Object.values(runState.rider.forms).forEach(forma => {
-                const btn = document.createElement('button');
-                btn.className = 'ff-btn text-center !text-white bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded p-3 font-bold transition-all';
-                btn.innerText = forma.name;
-                
-                btn.onclick = () => {
-                    // Injeta a carta diretamente na forma escolhida pelo usuário!
-                    runState.rider.forms[forma.id].ataques.push(cartaSelecionadaTemporaria);
-                    mostrarToast(`Sucesso: ${cartaSelecionadaTemporaria.nome} carregado no arquivo da ${forma.name}!`, "border-emerald-500 bg-emerald-900 text-white");
-                    cartaSelecionadaTemporaria = null;
-                    prosseguirMapa();
-                };
-                containerFormas.appendChild(btn);
-            });
-
-            document.getElementById('recDraft').classList.add('hidden');
-            document.getElementById('recAlocacao').classList.remove('hidden');
-        }
-
         function voltarCategorias() {
             document.getElementById('recDraft').classList.add('hidden');
-            document.getElementById('recAlocacao').classList.add('hidden');
             document.getElementById('recCategorias').classList.remove('hidden');
         }
     </script>
