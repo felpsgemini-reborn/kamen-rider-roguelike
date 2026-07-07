@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Kamen Rider: Chronicles Roguelike</title>
-    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
-    
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -21,41 +19,36 @@
             border-radius: 6px;
         }
         .ff-btn {
-            text-align: left;
-            width: 100%;
-            padding: 8px 12px;
-            font-family: monospace;
-            font-size: 14px;
-            text-transform: uppercase;
-            color: #cbd5e1;
-            border-left: 3px solid transparent;
-            transition: all 0.1s;
+            text-align: left; width: 100%; padding: 8px 12px; font-family: monospace;
+            font-size: 14px; text-transform: uppercase; color: #cbd5e1;
+            border-left: 3px solid transparent; transition: all 0.1s;
         }
         .ff-btn:hover:not(:disabled), .ff-btn.active {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-left: 3px solid #10b981;
-            padding-left: 16px;
+            background: rgba(255, 255, 255, 0.1); color: #fff;
+            border-left: 3px solid #10b981; padding-left: 16px;
         }
         .ff-btn:disabled { color: #475569; cursor: not-allowed; }
         
-        /* Layout do Mapa */
-        .map-node {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        .map-node { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .map-node.active:hover { transform: scale(1.15); box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); }
         .map-node.locked { filter: grayscale(100%) opacity(0.4); cursor: not-allowed; }
         
         .log-area { scroll-behavior: smooth; }
-        
-        /* Barra de rolagem customizada */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        
+        /* Animações do Toast */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-enter { animation: slideIn 0.3s ease-out forwards; }
     </style>
 </head>
-<body class="text-slate-100 font-sans h-screen w-screen flex flex-col justify-center items-center p-2 md:p-4">
+<body class="text-slate-100 font-sans h-screen w-screen flex flex-col justify-center items-center p-2 md:p-4 relative">
+
+    <div id="toastContainer" class="absolute top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none w-64 md:w-80"></div>
 
     <div id="gameContainer" class="w-full max-w-5xl h-full max-h-[700px] flex flex-col overflow-hidden relative border border-slate-700 rounded-xl bg-slate-900 shadow-2xl">
         
@@ -67,44 +60,38 @@
         </div>
 
         <div id="telaMapa" class="hidden flex-1 flex flex-col min-h-0 relative">
-            <header class="bg-slate-800 p-4 border-b border-slate-700 flex justify-between items-center z-10 shadow-lg shrink-0">
+            <header class="bg-slate-800 p-4 border-b border-slate-700 flex justify-between items-center z-10 shrink-0 shadow-lg">
                 <h2 class="font-bold text-emerald-400 font-mono tracking-widest uppercase text-sm md:text-base">Setor de Exploração</h2>
-                <div class="text-yellow-400 font-mono text-sm font-bold bg-slate-900 px-3 py-1 rounded border border-slate-700">🪙 Moedas Rider: <span id="hudMoedas">0</span></div>
+                <div class="text-yellow-400 font-mono text-sm font-bold bg-slate-900 px-3 py-1 rounded border border-slate-700">🪙 <span id="hudMoedas">0</span></div>
             </header>
             
-            <div class="flex-1 overflow-y-auto flex flex-col-reverse justify-start items-center p-8 gap-12 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGRpdiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojMGYxNzJhO2hlaWdodDoxMDAlO3dpZHRoOjEwMCU7Ij48L2Rpdj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxIiBmaWxsPSIjMzM0MTU1Ii8+PC9zdmc+')] bg-repeat" id="mapContainer">
-                </div>
+            <div class="flex-1 overflow-y-auto flex flex-col-reverse justify-start items-center p-8 gap-12 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGRpdiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojMGYxNzJhO2hlaWdodDoxMDAlO3dpZHRoOjEwMCU7Ij48L2Rpdj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxIiBmaWxsPSIjMzM0MTU1Ii8+PC9zdmc+')] bg-repeat" id="mapContainer"></div>
             
-            <div class="absolute bottom-4 left-0 w-full text-center pointer-events-none text-slate-500 font-mono text-xs uppercase tracking-widest opacity-50 font-bold">
-                ↓ Ponto de Partida ↓
-            </div>
+            <div class="absolute bottom-4 left-0 w-full text-center pointer-events-none text-slate-500 font-mono text-xs uppercase tracking-widest opacity-50 font-bold">↓ Ponto de Partida ↓</div>
         </div>
 
         <div id="telaRecompensa" class="hidden flex-1 flex flex-col items-center justify-center p-4 md:p-6 bg-slate-900/95 z-20 absolute inset-0">
             <h2 class="text-2xl md:text-3xl font-black text-yellow-400 mb-2 uppercase text-center">Batalha Concluída!</h2>
-            <p class="text-emerald-400 mb-8 font-mono text-sm md:text-base text-center">> Escolha sua recompensa da base de dados:</p>
+            <p class="text-emerald-400 mb-8 font-mono text-sm md:text-base text-center">> Arquivos descriptografados. Selecione:</p>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-3xl mb-8">
                 <button onclick="coletarRecompensa('ataque')" class="ff-menu p-4 md:p-6 hover:border-emerald-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
                     <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">⚔️</div>
                     <h3 class="font-bold text-white mb-2 text-sm md:text-base">Novo Ataque</h3>
-                    <p class="text-[10px] md:text-xs text-slate-400">Adiciona um golpe à Forma Base.</p>
+                    <p class="text-[10px] md:text-xs text-slate-400">Adiciona golpe aleatório ao Menu da Forma Base.</p>
                 </button>
                 <button onclick="coletarRecompensa('maxhp')" class="ff-menu p-4 md:p-6 hover:border-blue-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
                     <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">❤️</div>
                     <h3 class="font-bold text-white mb-2 text-sm md:text-base">Aprimoramento Core</h3>
-                    <p class="text-[10px] md:text-xs text-slate-400">Aumenta Vida Máxima em +15.</p>
+                    <p class="text-[10px] md:text-xs text-slate-400">Aumenta Vida Máxima e Cura +15 HP.</p>
                 </button>
                 <button onclick="coletarRecompensa('item')" class="ff-menu p-4 md:p-6 hover:border-yellow-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
                     <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">💊</div>
                     <h3 class="font-bold text-white mb-2 text-sm md:text-base">Suprimentos</h3>
-                    <p class="text-[10px] md:text-xs text-slate-400">Ganha 1 Item Consumível aleatório.</p>
+                    <p class="text-[10px] md:text-xs text-slate-400">Receba +1 Poção de Vida no Inventário.</p>
                 </button>
             </div>
-            
-            <button onclick="prosseguirMapa()" class="bg-slate-700 hover:bg-slate-600 px-6 py-2 rounded text-sm font-bold uppercase tracking-widest text-slate-300">
-                Pular (Skip)
-            </button>
+            <button onclick="prosseguirMapa()" class="text-slate-400 hover:text-white px-6 py-2 text-xs font-mono uppercase tracking-widest border-b border-slate-700 hover:border-white transition-colors">Ignorar (Skip)</button>
         </div>
 
         <div id="telaBatalha" class="hidden flex-1 flex flex-col gap-2 p-2">
@@ -133,7 +120,7 @@
             </header>
 
             <div class="flex-1 bg-slate-900 border border-slate-700 rounded relative flex flex-col p-4 overflow-hidden min-h-[150px]">
-                <div class="absolute top-2 left-2 bg-slate-800 px-2 py-1 rounded text-xs font-mono text-slate-400 border border-slate-700 shadow">Andar: <span id="hudAndar" class="text-white font-bold">1</span> | Turno: <span id="turnCounter" class="text-white font-bold">1</span></div>
+                <div class="absolute top-2 left-2 bg-slate-800 px-2 py-1 rounded text-xs font-mono text-slate-400 border border-slate-700 shadow">Andar: <span id="hudAndar" class="text-white">1</span> | Turno: <span id="turnCounter" class="text-white">1</span></div>
                 
                 <div class="flex-1 flex justify-between items-center px-4 md:px-10 text-5xl md:text-6xl">
                     <div id="spriteRider" class="transform transition-transform">🏍️</div>
@@ -150,7 +137,7 @@
                     <button onclick="mudarAba('ataques')" id="tab-ataques" class="ff-btn active shrink-0">Atacar</button>
                     <button onclick="mudarAba('habilidades')" id="tab-habilidades" class="ff-btn shrink-0">Hab.</button>
                     <button onclick="mudarAba('itens')" id="tab-itens" class="ff-btn flex justify-between shrink-0">
-                        <span>Itens</span> <span id="itemStatus" class="text-[10px] text-emerald-400 pt-1">1/1</span>
+                        <span>Itens</span> <span id="itemStatus" class="text-[10px] text-emerald-400 pt-1">0</span>
                     </button>
                     <button onclick="mudarAba('formas')" id="tab-formas" class="ff-btn shrink-0">Transf.</button>
                     
@@ -161,82 +148,95 @@
                 <div class="w-2/3 ff-menu p-2 overflow-y-auto" id="menuAcoes"></div>
             </div>
         </div>
-
     </div>
 
     <script>
-        // ================= DADOS =================
+        // ================= FUNÇÃO DE TOAST (AVISOS FLUTUANTES) =================
+        function mostrarToast(mensagem, corClasses = 'bg-slate-800 border-slate-600 text-white') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-enter p-3 rounded shadow-xl border-l-4 font-mono text-xs md:text-sm ${corClasses}`;
+            toast.innerHTML = mensagem;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.replace('toast-enter', 'opacity-0');
+                toast.style.transition = 'all 0.3s';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ================= DADOS IMUTÁVEIS (MOLDES) =================
         const DB_RIDERS = {
             kuuga: {
-                id: 'kuuga', name: 'Kamen Rider Kuuga',
-                baseHp: 100, maxEnergy: 10,
+                id: 'kuuga', name: 'Kamen Rider Kuuga', baseHp: 100, maxEnergy: 10,
                 forms: {
                     growing: {
                         id: 'growing', name: 'Growing Form', sprite: '⚪',
-                        ataques: [ { nome: 'Soco Fraco', custo: 2, dano: 5 }, { nome: 'Chute', custo: 4, dano: 12 } ],
-                        habilidades: [ { nome: 'Foco (+SP)', custo: 0, efeito: 'recuperar_sp', valor: 3 } ]
+                        ataques: [ { nome: 'Soco Fraco', custo: 2, dano: 5 }, { nome: 'Chute Crescente', custo: 4, dano: 12 } ],
+                        // BALANCEAMENTO: Adicionado "Fim de Turno" na descrição da habilidade
+                        habilidades: [ { nome: 'Foco (Passa Turno)', custo: 0, efeito: 'foco_energia', valor: 4 } ]
                     },
                     mighty: {
                         id: 'mighty', name: 'Mighty Form', sprite: '🔴',
                         ataques: [ { nome: 'Mighty Punch', custo: 3, dano: 15 }, { nome: 'Mighty Kick', custo: 8, dano: 35 } ],
-                        habilidades: [ { nome: 'Pose (Buff)', custo: 3, efeito: 'buff_atk', valor: 1.5 } ]
+                        habilidades: [ { nome: 'Pose (Buff Atk)', custo: 3, efeito: 'buff_atk', valor: 1.5 } ]
                     }
                 }
             }
         };
 
-        const DB_ITENS = [ { nome: 'Poção de Vida', custo: 2, efeito: 'cura', valor: 30 } ];
+        const DB_ATAQUES_POOL = [
+            { nome: 'Combo Relâmpago', custo: 3, dano: 10 },
+            { nome: 'Chute Giratório', custo: 5, dano: 18 },
+            { nome: 'Golpe Esmagador', custo: 6, dano: 24 },
+            { nome: 'Sequência Feroz', custo: 4, dano: 15 },
+            { nome: 'Impacto Direto', custo: 7, dano: 30 }
+        ];
 
-        // ================= ESTADO GLOBAL =================
+        // ================= ESTADO GLOBAL DA RUN (MUTÁVEL) =================
         let runState = {
-            andarAtual: 0, 
-            mapa: [],
-            moedas: 0,
-            rider: { id: 'kuuga', formaAtual: 'growing', hp: 100, maxHp: 100, sp: 10, maxSp: 10, buffAtk: 1 }
+            andarAtual: 0, mapa: [], moedas: 0, pocaoCount: 1, // Começa com 1 poção
+            rider: null // Será populado pelo "Clone" ao iniciar a run
         };
 
-        let battleState = {
-            ativa: false, turno: 1, itemUsado: false, abaAtual: 'ataques', enemy: null
-        };
+        let battleState = { ativa: false, turno: 1, itemUsado: false, abaAtual: 'ataques', enemy: null };
 
-        const menusDOM = {
-            boot: document.getElementById('telaBoot'),
-            mapa: document.getElementById('telaMapa'),
-            batalha: document.getElementById('telaBatalha'),
-            recompensa: document.getElementById('telaRecompensa')
-        };
+        const menusDOM = { boot: document.getElementById('telaBoot'), mapa: document.getElementById('telaMapa'), batalha: document.getElementById('telaBatalha'), recompensa: document.getElementById('telaRecompensa') };
+        function mostrarTela(tela) { Object.values(menusDOM).forEach(el => el.classList.add('hidden')); menusDOM[tela].classList.remove('hidden'); }
 
-        function mostrarTela(tela) {
-            Object.values(menusDOM).forEach(el => el.classList.add('hidden'));
-            menusDOM[tela].classList.remove('hidden');
-        }
-
-        // ================= MAPA =================
+        // ================= MAPA & PREPARAÇÃO =================
         function iniciarRun() {
-            runState.moedas = 0; runState.andarAtual = 0;
-            runState.rider.hp = DB_RIDERS.kuuga.baseHp; runState.rider.maxHp = DB_RIDERS.kuuga.baseHp;
-            gerarMapaAleatorio(); renderizarMapa();
-            mostrarTela('mapa');
+            runState.moedas = 0; runState.andarAtual = 0; runState.pocaoCount = 1;
+            
+            // DEEP COPY: Clona o molde do Kuuga para a run atual. Assim, os ataques não ficam salvos no jogo inteiro se ele morrer.
+            runState.rider = JSON.parse(JSON.stringify(DB_RIDERS.kuuga));
+            runState.rider.formaAtual = 'growing';
+            runState.rider.hp = runState.rider.baseHp; runState.rider.maxHp = runState.rider.baseHp;
+            runState.rider.sp = runState.rider.maxEnergy; runState.rider.maxSp = runState.rider.maxEnergy;
+            runState.rider.buffAtk = 1;
+
+            gerarMapaAleatorio(); renderizarMapa(); mostrarTela('mapa');
         }
 
+        // ... (Gerar Mapa e Renderizar Mapa continuam exatamente iguais ao anterior)
         function gerarMapaAleatorio() {
             runState.mapa = [];
             for (let i = 0; i < 10; i++) {
-                let opcoesNoAndar = [];
-                let numOpcoes = (i === 0 || i === 9) ? 1 : Math.floor(Math.random() * 3) + 1; 
-                
-                for(let j = 0; j < numOpcoes; j++) {
+                let opcoes = []; let num = (i === 0 || i === 9) ? 1 : Math.floor(Math.random() * 3) + 1; 
+                for(let j = 0; j < num; j++) {
                     let tipo = 'batalha'; let icone = '⚔️'; let cor = 'bg-red-900/80 border-red-500 text-red-100';
-                    if (i === 9) { tipo = 'chefe'; icone = '☠️'; cor = 'bg-purple-900/90 border-purple-500 scale-125'; }
-                    else if (i > 0 && i < 9) {
+                    if (i===9) { tipo='chefe'; icone='☠️'; cor='bg-purple-900/90 border-purple-500 scale-125'; }
+                    else if (i>0 && i<9) {
                         let r = Math.random();
                         if (r < 0.2) { tipo = 'descanso'; icone = '⛺'; cor = 'bg-emerald-900/80 border-emerald-500'; }
                         else if (r < 0.3) { tipo = 'loja'; icone = '💰'; cor = 'bg-yellow-900/80 border-yellow-500'; }
                         else if (r < 0.4) { tipo = 'evento'; icone = '❓'; cor = 'bg-blue-900/80 border-blue-500'; }
                     }
-                    opcoesNoAndar.push({ tipo, icone, cor });
+                    opcoes.push({ tipo, icone, cor });
                 }
-                runState.mapa.push(opcoesNoAndar);
+                runState.mapa.push(opcoes);
             }
         }
 
@@ -245,52 +245,34 @@
             document.getElementById('hudMoedas').innerText = runState.moedas;
             container.innerHTML = '';
 
-            runState.mapa.forEach((andar, index) => {
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'flex gap-8 justify-center w-full relative mb-4';
-                
-                const isAtivo = index === runState.andarAtual;
-                const isPassado = index < runState.andarAtual;
-
+            runState.mapa.forEach((andar, idx) => {
+                const row = document.createElement('div'); row.className = 'flex gap-8 justify-center w-full relative mb-4';
                 andar.forEach(no => {
                     const btn = document.createElement('button');
                     btn.className = `map-node flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full border-4 text-xl md:text-2xl shadow-lg ${no.cor} `;
                     btn.innerHTML = no.icone;
-                    
-                    if (isAtivo) {
-                        btn.classList.add('active', 'animate-pulse', 'cursor-pointer');
-                        btn.onclick = () => entrarNoMapa(no.tipo);
-                    } else if (isPassado) {
-                        btn.classList.add('locked', 'border-slate-500', 'bg-slate-800');
-                        btn.innerHTML = '✔️';
-                    } else {
-                        btn.classList.add('locked');
-                    }
-                    rowDiv.appendChild(btn);
+                    if (idx === runState.andarAtual) { btn.classList.add('active', 'animate-pulse', 'cursor-pointer'); btn.onclick = () => entrarNoMapa(no.tipo); }
+                    else if (idx < runState.andarAtual) { btn.classList.add('locked', 'border-slate-500', 'bg-slate-800'); btn.innerHTML = '✔️'; }
+                    else { btn.classList.add('locked'); }
+                    row.appendChild(btn);
                 });
-                container.appendChild(rowDiv);
+                container.appendChild(row);
             });
-
-            // FIX DA CÂMERA: Foca automaticamente no nó atual
             setTimeout(() => {
-                const activeNode = container.querySelector('.map-node.active');
-                if(activeNode) {
-                    activeNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                } else {
-                    container.scrollTop = container.scrollHeight;
-                }
-            }, 100); // Pequeno atraso para garantir que o DOM renderizou
+                const atv = container.querySelector('.map-node.active');
+                if(atv) atv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
         }
 
         function entrarNoMapa(tipo) {
-            if (tipo === 'batalha' || tipo === 'chefe') {
-                prepararCombate(tipo); mostrarTela('batalha');
-            } else if (tipo === 'descanso') {
-                alert("Casa de Descanso! Recuperou 30 HP.");
+            if (tipo === 'batalha' || tipo === 'chefe') { prepararCombate(tipo); mostrarTela('batalha'); }
+            else if (tipo === 'descanso') {
                 runState.rider.hp = Math.min(runState.rider.maxHp, runState.rider.hp + 30);
+                mostrarToast('Casa de Descanso! Recuperou 30 HP.', 'border-emerald-500 bg-slate-800 text-emerald-400');
                 prosseguirMapa();
             } else {
-                alert(`Você entrou em um nó de: ${tipo}. Em construção!`);
+                mostrarToast(`Nó de ${tipo} em construção! +10 Moedas.`, 'border-yellow-500 bg-slate-800');
+                runState.moedas += 10;
                 prosseguirMapa();
             }
         }
@@ -298,50 +280,45 @@
         function prosseguirMapa() {
             runState.andarAtual++;
             if (runState.andarAtual >= 10) {
-                alert("FIM DE JOGO! VOCÊ VENCEU A RUN!");
-                mostrarTela('boot');
-            } else {
-                renderizarMapa(); mostrarTela('mapa');
-            }
+                mostrarToast("FIM DE JOGO! VOCÊ VENCEU A RUN!", "border-emerald-500 bg-emerald-900 text-white font-bold text-lg");
+                setTimeout(() => mostrarTela('boot'), 2000);
+            } else { renderizarMapa(); mostrarTela('mapa'); }
         }
 
         // ================= COMBATE =================
-        function prepararCombate(tipo) {
-            battleState.ativa = true; battleState.turno = 1; battleState.itemUsado = false;
-            runState.rider.formaAtual = 'growing'; runState.rider.sp = runState.rider.maxSp;
-            
-            battleState.enemy = { 
-                name: tipo === 'chefe' ? 'Boss Grongi' : 'Grongi Aleatório', 
-                hp: tipo === 'chefe' ? 150 : 50 + (runState.andarAtual * 5), 
-                maxHp: tipo === 'chefe' ? 150 : 50 + (runState.andarAtual * 5), 
-                danoBase: tipo === 'chefe' ? 15 : 6 
-            };
-            
-            document.getElementById('hudAndar').innerText = runState.andarAtual + 1;
-            document.getElementById('battleLog').innerHTML = '<p class="text-emerald-400">> Batalha Iniciada!</p>';
-            atualizarHUD(); mudarAba('ataques');
-        }
-
         function log(msg, cor = 'text-slate-300') {
             const p = document.createElement('p'); p.className = `mb-1 ${cor}`; p.innerText = `> ${msg}`;
             const bl = document.getElementById('battleLog'); bl.appendChild(p); bl.scrollTop = bl.scrollHeight;
         }
 
+        function prepararCombate(tipo) {
+            battleState.ativa = true; battleState.turno = 1; battleState.itemUsado = false;
+            runState.rider.formaAtual = 'growing'; runState.rider.sp = runState.rider.maxSp;
+            battleState.enemy = { 
+                name: tipo === 'chefe' ? 'Boss Grongi' : 'Grongi Aleatório', 
+                hp: tipo === 'chefe' ? 150 : 50 + (runState.andarAtual * 5), maxHp: tipo === 'chefe' ? 150 : 50 + (runState.andarAtual * 5), 
+                danoBase: tipo === 'chefe' ? 15 : 6 
+            };
+            document.getElementById('hudAndar').innerText = runState.andarAtual + 1;
+            document.getElementById('battleLog').innerHTML = '<p class="text-emerald-400">> Batalha Iniciada!</p>';
+            atualizarHUD(); mudarAba('ataques');
+        }
+
         function atualizarHUD() {
-            const rData = DB_RIDERS[runState.rider.id]; const fData = rData.forms[runState.rider.formaAtual];
-            document.getElementById('hudRiderName').innerText = `${rData.name} (${fData.name})`;
-            document.getElementById('hudHp').innerText = `${runState.rider.hp}/${runState.rider.maxHp}`;
-            document.getElementById('hudSp').innerText = `${runState.rider.sp}/${runState.rider.maxSp}`;
+            const r = runState.rider; const f = r.forms[r.formaAtual];
+            document.getElementById('hudRiderName').innerText = `${r.name} (${f.name})`;
+            document.getElementById('hudHp').innerText = `${r.hp}/${r.maxHp}`;
+            document.getElementById('hudSp').innerText = `${r.sp}/${r.maxSp}`;
             document.getElementById('hudEnemyHp').innerText = `${battleState.enemy.hp}/${battleState.enemy.maxHp}`;
             document.getElementById('turnCounter').innerText = battleState.turno;
-            document.getElementById('spriteRider').innerText = fData.sprite;
-            document.getElementById('barHp').style.width = `${Math.max(0, (runState.rider.hp / runState.rider.maxHp) * 100)}%`;
-            document.getElementById('barSp').style.width = `${Math.max(0, (runState.rider.sp / runState.rider.maxSp) * 100)}%`;
+            document.getElementById('spriteRider').innerText = f.sprite;
+            document.getElementById('barHp').style.width = `${Math.max(0, (r.hp / r.maxHp) * 100)}%`;
+            document.getElementById('barSp').style.width = `${Math.max(0, (r.sp / r.maxSp) * 100)}%`;
             document.getElementById('barEnemyHp').style.width = `${Math.max(0, (battleState.enemy.hp / battleState.enemy.maxHp) * 100)}%`;
             
             const ib = document.getElementById('itemStatus');
-            ib.innerText = battleState.itemUsado ? "0/1" : "1/1";
-            ib.className = `text-[10px] pt-1 ${battleState.itemUsado ? 'text-red-400' : 'text-emerald-400'}`;
+            ib.innerText = runState.pocaoCount; // Mostra a quantidade real no botão da Aba
+            ib.className = `text-[10px] pt-1 ${runState.pocaoCount > 0 && !battleState.itemUsado ? 'text-emerald-400' : 'text-red-400'}`;
         }
 
         function mudarAba(novaAba) {
@@ -352,20 +329,20 @@
             const menuAcoes = document.getElementById('menuAcoes'); menuAcoes.innerHTML = '';
             
             if (!battleState.ativa) {
-                if(runState.rider.hp > 0) {
-                    menuAcoes.innerHTML = `<button onclick="vencerCombate()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest animate-bounce mt-4 text-sm md:text-base">Coletar Recompensa</button>`;
-                } else {
-                    menuAcoes.innerHTML = `<button onclick="mostrarTela('boot')" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4 text-sm md:text-base">Fim de Jogo</button>`;
-                }
+                if(runState.rider.hp > 0) menuAcoes.innerHTML = `<button onclick="vencerCombate()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Descriptografar Recompensa</button>`;
+                else menuAcoes.innerHTML = `<button onclick="mostrarTela('boot')" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Retornar à Base</button>`;
                 return;
             }
 
-            const fData = DB_RIDERS[runState.rider.id].forms[runState.rider.formaAtual];
+            const fData = runState.rider.forms[runState.rider.formaAtual]; // Lê do clone
 
             if (novaAba === 'ataques') fData.ataques.forEach(a => criarSlotAcao(a.nome, a.custo, () => usarAtaque(a)));
             else if (novaAba === 'habilidades') fData.habilidades.forEach(h => criarSlotAcao(h.nome, h.custo, () => usarHabilidade(h)));
-            else if (novaAba === 'itens') DB_ITENS.forEach(i => { let b = criarSlotAcao(i.nome, i.custo, () => usarItem(i)); if(battleState.itemUsado) b.disabled = true; });
-            else if (novaAba === 'formas') Object.values(DB_RIDERS[runState.rider.id].forms).forEach(f => { if(f.id !== runState.rider.formaAtual) criarSlotAcao(`Form: ${f.name}`, 3, () => transformar(f.id)); });
+            else if (novaAba === 'itens') {
+                const b = criarSlotAcao(`Poção de Cura (Tem: ${runState.pocaoCount})`, 2, () => usarItem());
+                if(battleState.itemUsado || runState.pocaoCount <= 0) b.disabled = true;
+            }
+            else if (novaAba === 'formas') Object.values(runState.rider.forms).forEach(f => { if(f.id !== runState.rider.formaAtual) criarSlotAcao(`Form: ${f.name}`, 3, () => transformar(f.id)); });
         }
 
         function criarSlotAcao(nome, custo, cb) {
@@ -385,28 +362,37 @@
         function usarHabilidade(hab) {
             if (!battleState.ativa || runState.rider.sp < hab.custo) return;
             runState.rider.sp -= hab.custo;
-            if(hab.efeito==='recuperar_sp') { runState.rider.sp = Math.min(runState.rider.maxSp, runState.rider.sp+hab.valor); log(`Recuperou ${hab.valor} SP.`, 'text-cyan-300'); }
-            else if(hab.efeito==='buff_atk') { runState.rider.buffAtk = hab.valor; log(`Ataque Buffado!`, 'text-orange-300'); }
+            
+            // BALANCEAMENTO: Foco agora encerra o turno após recuperar SP!
+            if(hab.efeito === 'foco_energia') { 
+                runState.rider.sp = Math.min(runState.rider.maxSp, runState.rider.sp + hab.valor); 
+                log(`Concentrou poder! Recuperou ${hab.valor} SP. O FOCO ENCERROU O SEU TURNO.`, 'text-cyan-300 font-bold'); 
+                verificarFim();
+                if(battleState.ativa) passarTurno(); // Força o passe de turno
+                return;
+            }
+            else if(hab.efeito === 'buff_atk') { runState.rider.buffAtk = hab.valor; log(`Ataque Buffado!`, 'text-orange-300'); }
             verificarFim();
         }
 
-        function usarItem(item) {
-            if (!battleState.ativa || battleState.itemUsado || runState.rider.sp < item.custo) return;
-            battleState.itemUsado = true; runState.rider.sp -= item.custo;
-            if(item.efeito==='cura') { runState.rider.hp = Math.min(runState.rider.maxHp, runState.rider.hp+item.valor); log(`Curou ${item.valor} HP.`, 'text-emerald-300'); }
+        function usarItem() {
+            if (!battleState.ativa || battleState.itemUsado || runState.pocaoCount <= 0 || runState.rider.sp < 2) return;
+            battleState.itemUsado = true; runState.rider.sp -= 2; runState.pocaoCount--;
+            runState.rider.hp = Math.min(runState.rider.maxHp, runState.rider.hp + 30);
+            log(`Usou [Poção de Cura]. Curou 30 HP.`, 'text-emerald-300');
             verificarFim();
         }
 
         function transformar(novaForma) {
             if (!battleState.ativa || runState.rider.sp < 3) return;
             runState.rider.sp -= 3; runState.rider.formaAtual = novaForma;
-            log(`HENSHIN! ${DB_RIDERS[runState.rider.id].forms[novaForma].name}!`, 'text-yellow-400 font-bold');
+            log(`HENSHIN! ${runState.rider.forms[novaForma].name}!`, 'text-yellow-400 font-bold');
             atualizarHUD(); mudarAba('ataques');
         }
 
         function passarTurno() {
             if (!battleState.ativa) return;
-            log('Fim do seu turno.', 'text-slate-500'); battleState.ativa = false;
+            log('Fim do seu turno.', 'text-slate-500'); battleState.ativa = false; mudarAba(battleState.abaAtual);
             
             setTimeout(() => {
                 if(battleState.enemy.hp > 0) {
@@ -427,14 +413,11 @@
 
         function verificarFim() {
             atualizarHUD(); mudarAba(battleState.abaAtual);
-            if (battleState.enemy.hp <= 0) {
-                battleState.ativa = false; log('VITÓRIA!', 'text-yellow-400 font-bold text-lg'); mudarAba('ataques'); 
-            } else if (runState.rider.hp <= 0) {
-                battleState.ativa = false; log('GAME OVER.', 'text-red-500 font-bold text-lg'); mudarAba('ataques');
-            }
+            if (battleState.enemy.hp <= 0) { battleState.ativa = false; log('VITÓRIA!', 'text-yellow-400 font-bold text-lg'); mudarAba('ataques'); } 
+            else if (runState.rider.hp <= 0) { battleState.ativa = false; log('GAME OVER.', 'text-red-500 font-bold text-lg'); mudarAba('ataques'); }
         }
 
-        // ================= RECOMPENSA =================
+        // ================= LÓGICA REAL DE RECOMPENSA =================
         function vencerCombate() {
             const moedasGanhas = 15 + Math.floor(Math.random() * 10);
             runState.moedas += moedasGanhas;
@@ -443,9 +426,32 @@
         }
 
         function coletarRecompensa(tipo) {
-            if(tipo === 'maxhp') { runState.rider.maxHp += 15; runState.rider.hp += 15; alert("HP Máximo aumentado!"); } 
-            else if (tipo === 'ataque') { alert("Nesta versão mock, você aprendeu um golpe!"); } 
-            else { alert("Você ganhou 1 Poção extra!"); }
+            if(tipo === 'maxhp') { 
+                runState.rider.maxHp += 15; runState.rider.hp += 15; 
+                mostrarToast("Aprimoramento Core: +15 HP e Cura Efetuada!", "border-blue-500 bg-blue-900 text-white"); 
+            } 
+            else if (tipo === 'ataque') { 
+                // Pega os ataques que o Kuuga Base (Growing) já tem na run atual
+                const ataquesAtuais = runState.rider.forms.growing.ataques.map(a => a.nome);
+                
+                // Filtra da Pool os ataques que ele AINDA NÃO TEM
+                const ataquesDisponiveis = DB_ATAQUES_POOL.filter(a => !ataquesAtuais.includes(a.nome));
+                
+                if (ataquesDisponiveis.length > 0) {
+                    // Sorteia um novo
+                    const novoAtaque = ataquesDisponiveis[Math.floor(Math.random() * ataquesDisponiveis.length)];
+                    // INVENTÁRIO REAL: Insere o ataque no clone da run atual
+                    runState.rider.forms.growing.ataques.push(novoAtaque);
+                    mostrarToast(`Arquivo Adquirido: ${novoAtaque.nome} adicionado ao Menu!`, "border-emerald-500 bg-emerald-900 text-white");
+                } else {
+                    mostrarToast(`Você já possui todos os ataques básicos! +50 Moedas como compensação.`, "border-yellow-500 bg-yellow-900 text-white");
+                    runState.moedas += 50;
+                }
+            } 
+            else if (tipo === 'item') { 
+                runState.pocaoCount++;
+                mostrarToast(`Suprimentos recebidos! Poções atuais: ${runState.pocaoCount}`, "border-yellow-500 bg-slate-800 text-yellow-400");
+            }
             prosseguirMapa();
         }
     </script>
