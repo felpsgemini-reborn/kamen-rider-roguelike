@@ -22,6 +22,7 @@
             text-align: left; width: 100%; padding: 8px 12px; font-family: monospace;
             font-size: 14px; text-transform: uppercase; color: #cbd5e1;
             border-left: 3px solid transparent; transition: all 0.1s;
+            cursor: pointer;
         }
         .ff-btn:hover:not(:disabled), .ff-btn.active {
             background: rgba(255, 255, 255, 0.1); color: #fff;
@@ -30,7 +31,7 @@
         .ff-btn:disabled { color: #475569; cursor: not-allowed; }
         .ff-btn:active:not(:disabled) { transform: scale(0.98); background: rgba(16, 185, 129, 0.2); }
         
-        .map-node { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .map-node { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
         .map-node.active:hover { transform: scale(1.15); box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); }
         .map-node.locked { filter: grayscale(100%) opacity(0.4); cursor: not-allowed; }
         
@@ -83,7 +84,7 @@
                     <button onclick="coletarRecompensaDireta('item')" class="ff-menu p-4 md:p-6 hover:border-yellow-400 hover:-translate-y-2 transition-transform group text-center cursor-pointer">
                         <div class="text-4xl mb-4 group-hover:scale-110 transition-transform">💊</div>
                         <h3 class="font-bold text-white mb-2 text-sm md:text-base">Suprimentos</h3>
-                        <p class="text-[10px] md:text-xs text-slate-400">Sincroniza +1 Módulo de Cura no cinto de utilidades.</p>
+                        <p class="text-[10px] md:text-xs text-slate-400">Sincroniza +1 Poção de Cura no cinto de utilidades.</p>
                     </button>
                 </div>
                 <button onclick="prosseguirMapa()" class="text-slate-400 hover:text-white px-6 py-2 text-xs font-mono uppercase tracking-widest border-b border-slate-700 hover:border-white transition-colors">Ignorar (Skip)</button>
@@ -142,7 +143,7 @@
                 <div class="absolute top-2 left-2 bg-slate-800 px-2 py-1 rounded text-xs font-mono text-slate-400 border border-slate-700 shadow">Andar: <span id="hudAndar" class="text-white">1</span> | Turno: <span id="turnCounter" class="text-white">1</span> <span id="badgeFaseTurno" class="ml-2 bg-blue-900 px-1 rounded text-white font-bold uppercase text-[10px]"></span></div>
                 
                 <div class="flex-1 flex justify-between items-center px-4 md:px-12 text-5xl md:text-6xl relative">
-                    <div id="spriteRider" class="transform transition-transform duration-200">Model_Base</div>
+                    <div id="spriteRider" class="transform transition-transform duration-200">⚪</div>
                     <div id="spriteCompanheiro" class="transform transition-transform duration-200 text-4xl hidden opacity-80"></div>
                     <div id="spriteEnemy" class="transform animate-pulse duration-500">🦇</div>
                 </div>
@@ -151,7 +152,7 @@
             </div>
 
             <div class="h-48 md:h-56 flex gap-2 shrink-0">
-                <div class="w-1/3 ff-menu p-2 flex flex-col overflow-y-auto" id="colunaAbasEsquerda">
+                <div class="w-1/3 ff-menu p-2 flex flex-col overflow-y-auto z-10" id="colunaAbasEsquerda">
                     <button onclick="mudarAba('ataques')" id="tab-ataques" class="ff-btn active shrink-0">Atacar</button>
                     <button onclick="mudarAba('habilidades')" id="tab-habilidades" class="ff-btn shrink-0">Hab.</button>
                     <button onclick="mudarAba('itens')" id="tab-itens" class="ff-btn flex justify-between shrink-0">
@@ -163,14 +164,21 @@
                         <button onclick="passarTurno()" id="btnPassarTurno" class="ff-btn !text-yellow-400 hover:!border-yellow-400 truncate">Passar Turno</button>
                     </div>
                 </div>
-                <div class="w-2/3 ff-menu p-2 overflow-y-auto" id="menuAcoes"></div>
+                <div class="w-2/3 ff-menu p-2 overflow-y-auto z-10" id="menuAcoes"></div>
             </div>
         </div>
     </div>
 
     <script>
+        // Rastreador de Erros Globais (Impede falhas silenciosas)
+        window.onerror = function(message, source, lineno, colno, error) {
+            mostrarToast(`CRITICAL ERROR: ${message}`, 'bg-red-600 border-white text-white font-bold');
+            return false;
+        };
+
         function mostrarToast(mensagem, corClasses = 'bg-slate-800 border-slate-600 text-white') {
             const container = document.getElementById('toastContainer');
+            if(!container) return;
             const toast = document.createElement('div');
             toast.className = `toast-enter p-3 rounded shadow-xl border-l-4 font-mono text-xs md:text-sm ${corClasses}`;
             toast.innerHTML = mensagem;
@@ -181,7 +189,7 @@
             }, 3000);
         }
 
-        // ================= BASE DE DADOS BALANCEADA CORRETAMENTE =================
+        // ================= BASE DE DADOS =================
         const DB_RIDERS = {
             kuuga: {
                 id: 'kuuga', name: 'Kamen Rider Kuuga', baseHp: 100, maxEnergy: 10,
@@ -200,33 +208,22 @@
             }
         };
 
-        // FIX BALANCEAMENTO: Danos aumentados substancialmente para justificar a escolha tática!
         const DB_ATAQUES_POOL = [
-            { nome: 'Combo Relâmpago', custo: 3, dano: 16, desc: 'Ataque elétrico de alta eficiência energética.' },
+            { nome: 'Combo Relâmpago', custo: 3, dano: 16, desc: 'Ataque elétrico de alta eficiência.' },
             { nome: 'Chute Giratório', custo: 4, dano: 22, desc: 'Golpe de rotação que desestabiliza o alvo.' },
             { nome: 'Golpe Esmagador', custo: 5, dano: 32, desc: 'Pesado e violento. Destrói defesas orgânicas.' },
-            { nome: 'Sequência Feroz', custo: 3, dano: 18, desc: 'Série rápida de estocadas frontais de impacto.' },
-            { nome: 'Impacto Direto', custo: 6, dano: 45, desc: 'Canalização concentrada de energia de fissão.' }
+            { nome: 'Sequência Feroz', custo: 3, dano: 18, desc: 'Série rápida de estocadas frontais.' },
+            { nome: 'Impacto Direto', custo: 6, dano: 45, desc: 'Canalização concentrada de energia.' }
         ];
 
-        // POOL DE COMPANHEIROS DISPONÍVEIS NA CASA DE COMPANHEIROS
         const DB_COMPANHEIROS_POOL = [
             { id: 'g3', name: 'Kamen Rider G3', sprite: '🔵', hp: 80, maxHp: 80, sp: 6, maxSp: 6, ataques: [ { nome: 'GM-01 Trigger', custo: 2, dano: 14 }, { nome: 'GG-02 Salamander', custo: 4, dano: 28 } ], desc: 'Guerreiro de armadura mecânica tática.' },
-            { id: 'agito', name: 'Kamen Rider Agito', sprite: '🟡', hp: 90, maxHp: 90, sp: 8, maxSp: 8, ataques: [ { nome: 'Agito Punch', custo: 3, dano: 18 }, { nome: 'Rider Kick (Agito)', custo: 6, dano: 42 } ], desc: 'Rider ancestral movido pela força desperta.' },
-            { id: 'gills', name: 'Kamen Rider Gills', sprite: '🟢', hp: 110, maxHp: 110, sp: 5, maxSp: 5, ataques: [ { nome: 'Gills Claw', custo: 2, dano: 15 }, { nome: 'Gills Heel Claw', custo: 4, dano: 30 } ], desc: 'Força mutante biológica agressiva e resistente.' }
+            { id: 'agito', name: 'Kamen Rider Agito', sprite: '🟡', hp: 90, maxHp: 90, sp: 8, maxSp: 8, ataques: [ { nome: 'Agito Punch', custo: 3, dano: 18 }, { nome: 'Rider Kick', custo: 6, dano: 42 } ], desc: 'Rider ancestral movido pela força desperta.' },
+            { id: 'gills', name: 'Kamen Rider Gills', sprite: '🟢', hp: 110, maxHp: 110, sp: 5, maxSp: 5, ataques: [ { nome: 'Gills Claw', custo: 2, dano: 15 }, { nome: 'Gills Heel Claw', custo: 4, dano: 30 } ], desc: 'Força mutante biológica agressiva.' }
         ];
 
-        // ================= ESTADOS MUTAIS DA RUN =================
-        let runState = {
-            andarAtual: 0, mapa: [], moedas: 0, pocaoCount: 1,
-            rider: null,
-            companheiro: null // Armazena o objeto do companheiro caso seja recrutado na run
-        };
-
-        let battleState = {
-            fase: 'jogador', // Fases: 'jogador', 'companheiro', 'inimigo', 'vitoria', 'derrota'
-            turno: 1, itemUsado: false, habilidadesUsadas: {}, abaAtual: 'ataques', enemy: null
-        };
+        let runState = { andarAtual: 0, mapa: [], moedas: 0, pocaoCount: 1, rider: null, companheiro: null };
+        let battleState = { fase: 'jogador', turno: 1, itemUsado: false, habilidadesUsadas: {}, abaAtual: 'ataques', enemy: null };
 
         const menusDOM = { boot: document.getElementById('telaBoot'), mapa: document.getElementById('telaMapa'), batalha: document.getElementById('telaBatalha'), recompensa: document.getElementById('telaRecompensa') };
         function mostrarTela(tela) { Object.values(menusDOM).forEach(el => el.classList.add('hidden')); menusDOM[tela].classList.remove('hidden'); }
@@ -237,7 +234,6 @@
             runState.rider = JSON.parse(JSON.stringify(DB_RIDERS.kuuga));
             runState.rider.formaAtual = 'growing'; runState.rider.hp = runState.rider.baseHp; runState.rider.maxHp = runState.rider.baseHp;
             runState.rider.sp = runState.rider.maxEnergy; runState.rider.maxSp = runState.rider.maxEnergy; runState.rider.buffAtk = 1;
-            
             gerarMapaAleatorio(); renderizarMapa(); mostrarTela('mapa');
         }
 
@@ -252,7 +248,6 @@
                         let r = Math.random();
                         if (r < 0.25) { tipo = 'descanso'; icone = '⛺'; cor = 'bg-emerald-900/80 border-emerald-500'; }
                         else if (r < 0.45) { tipo = 'loja'; icone = '💰'; cor = 'bg-yellow-900/80 border-yellow-500'; }
-                        // NOVA ADIÇÃO: Casa de Companheiros determinística no mapa!
                         else if (r < 0.65) { tipo = 'companheiro'; icone = '👥'; cor = 'bg-indigo-900/80 border-indigo-500 text-indigo-200'; }
                     }
                     opcoes.push({ tipo, icone, cor });
@@ -285,33 +280,26 @@
             else if (tipo === 'descanso') {
                 runState.rider.hp = Math.min(runState.rider.maxHp, runState.rider.hp + 30);
                 if(runState.companheiro) runState.companheiro.hp = Math.min(runState.companheiro.maxHp, runState.companheiro.hp + 25);
-                mostrarToast('Setor de Descanso! Integridade da equipe restaurada.', 'border-emerald-500 bg-slate-800 text-emerald-400'); prosseguirMapa();
-            } 
-            // ACIONA A CASA DE COMPANHEIROS (DRAFT 1 DE 3)
-            else if (tipo === 'companheiro') { abrirCasaCompanheiros(); }
-            else {
-                mostrarToast(`Terminal [${tipo.toUpperCase()}] descriptografado! +20 Moedas.`, 'border-yellow-500 bg-slate-800'); runState.moedas += 20; prosseguirMapa();
-            }
+                mostrarToast('Setor Seguro! HP da equipe restaurado.', 'border-emerald-500 bg-slate-800 text-emerald-400'); prosseguirMapa();
+            } else if (tipo === 'companheiro') { abrirCasaCompanheiros(); }
+            else { mostrarToast(`Terminal [${tipo.toUpperCase()}] em manutenção! +20 Moedas.`, 'border-yellow-500 bg-slate-800'); runState.moedas += 20; prosseguirMapa(); }
         }
 
         function prosseguirMapa() {
             runState.andarAtual++;
             if (runState.andarAtual >= 10) {
-                mostrarToast("SISTEMA CONCLUÍDO! VITÓRIA DA RUN!", "border-emerald-500 bg-emerald-900 text-white font-bold text-lg");
+                mostrarToast("SISTEMA CONCLUÍDO! VITÓRIA!", "border-emerald-500 bg-emerald-900 text-white font-bold text-lg");
                 setTimeout(() => mostrarTela('boot'), 2000);
             } else { renderizarMapa(); mostrarTela('mapa'); }
         }
 
-        // ================= INTERFACE DA CASA DE COMPANHEIROS =================
+        // ================= COMPANHEIROS =================
         function abrirCasaCompanheiros() {
             document.getElementById('txtTituloRecompensa').innerText = "Sinal de Rádio Identificado!";
             document.getElementById('txtDescricaoDraft').innerText = "> Escolha 1 aliado tático para assinar o protocolo de combate:";
-            
             const container = document.getElementById('containerCartasDraft'); container.innerHTML = '';
             
-            // Sorteia 3 companheiros da pool imutável
             const sorteados = [...DB_COMPANHEIROS_POOL].sort(() => 0.5 - Math.random()).slice(0, 3);
-            
             sorteados.forEach(comp => {
                 const btn = document.createElement('button');
                 btn.className = 'ff-menu p-4 hover:border-indigo-400 hover:-translate-y-2 transition-transform text-left cursor-pointer flex flex-col h-full';
@@ -320,36 +308,36 @@
                         <h3 class="font-bold text-indigo-300 text-sm md:text-base">${comp.name} ${comp.sprite}</h3>
                         <span class="text-emerald-400 font-mono text-xs bg-slate-800 px-2 py-0.5 rounded border border-slate-700">HP: ${comp.maxHp}</span>
                     </div>
-                    <div class="text-purple-400 font-mono text-[11px] mb-2 font-bold">Técnicas inclusas no ID:</div>
+                    <div class="text-purple-400 font-mono text-[11px] mb-2 font-bold">Técnicas inclusas:</div>
                     <ul class="text-[10px] text-slate-300 list-disc list-inside mb-4 space-y-0.5 flex-1">
                         ${comp.ataques.map(a => `<li>${a.nome} (${a.dano} Dmg / ${a.custo} SP)</li>`).join('')}
                     </ul>
                     <p class="text-[10px] text-slate-400 italic border-t border-slate-800 pt-2">${comp.desc}</p>
                 `;
-                
                 btn.onclick = () => {
-                    // Copia o companheiro para a run ativa
                     runState.companheiro = JSON.parse(JSON.stringify(comp));
-                    mostrarToast(`${comp.name} acoplado à sua equipe com sucesso!`, "border-indigo-500 bg-indigo-950 text-white");
+                    mostrarToast(`${comp.name} acoplado à equipe!`, "border-indigo-500 bg-indigo-950 text-white");
                     prosseguirMapa();
                 };
                 container.appendChild(btn);
             });
-
-            document.getElementById('btnVoltarDraft').classList.add('hidden'); // Impede voltar para categorias normais
+            document.getElementById('btnVoltarDraft').classList.add('hidden');
             document.getElementById('recCategorias').classList.add('hidden');
             document.getElementById('recDraft').classList.remove('hidden');
             mostrarTela('recompensa');
         }
 
-        // ================= COMBATE =================
+        // ================= COMBATE BLINDADO =================
+        function log(msg, cor = 'text-slate-300') {
+            const p = document.createElement('p'); p.className = `mb-1 ${cor}`; p.innerText = `> ${msg}`;
+            const bl = document.getElementById('battleLog'); bl.appendChild(p); bl.scrollTop = bl.scrollHeight;
+        }
+
         function prepararCombate(tipo) {
             battleState.fase = 'jogador'; battleState.turno = 1; battleState.itemUsado = false; battleState.habilidadesUsadas = {};
-            runState.rider.formaAtual = 'growing'; runState.rider.sp = runState.rider.maxSp;
+            runState.rider.formaAtual = 'growing'; runState.rider.sp = runState.rider.maxSp; runState.rider.buffAtk = 1;
             
-            if(runState.companheiro) {
-                runState.companheiro.sp = runState.companheiro.maxSp; // Inicializa energia do aliado
-            }
+            if(runState.companheiro) runState.companheiro.sp = runState.companheiro.maxSp;
 
             battleState.enemy = { 
                 name: tipo === 'chefe' ? 'Boss Grongi' : 'Kaijin Shocker', 
@@ -358,21 +346,18 @@
             };
             
             document.getElementById('hudAndar').innerText = runState.andarAtual + 1;
-            document.getElementById('battleLog').innerHTML = '<p class="text-emerald-400">> Conexão estabelecida. Combate ativo.</p>';
+            document.getElementById('battleLog').innerHTML = ''; // Limpa log antigo para não estourar memória
+            log('Conexão estabelecida. Combate ativo.', 'text-emerald-400');
             
-            // Controla a exibição do companheiro na HUD e na Arena Visual
             const boxComp = document.getElementById('hudBoxCompanheiro');
             const spriteComp = document.getElementById('spriteCompanheiro');
             if(runState.companheiro) {
-                boxComp.classList.remove('hidden');
-                spriteComp.classList.remove('hidden');
+                boxComp.classList.remove('hidden'); spriteComp.classList.remove('hidden');
                 document.getElementById('hudCompName').innerText = runState.companheiro.name;
                 spriteComp.innerText = runState.companheiro.sprite;
             } else {
-                boxComp.classList.add('hidden');
-                spriteComp.classList.add('hidden');
+                boxComp.classList.add('hidden'); spriteComp.classList.add('hidden');
             }
-
             atualizarHUD(); mudarAba('ataques');
         }
 
@@ -389,7 +374,6 @@
             document.getElementById('barSp').style.width = `${Math.max(0, (r.sp / r.maxSp) * 100)}%`;
             document.getElementById('barEnemyHp').style.width = `${Math.max(0, (battleState.enemy.hp / battleState.enemy.maxHp) * 100)}%`;
             
-            // Atualiza HUD do companheiro se ele existir
             if(runState.companheiro) {
                 document.getElementById('hudCompHp').innerText = `${Math.max(0, runState.companheiro.hp)}/${runState.companheiro.maxHp}`;
                 document.getElementById('hudCompSp').innerText = `${runState.companheiro.sp}/${runState.companheiro.maxSp}`;
@@ -397,7 +381,6 @@
                 document.getElementById('barCompSp').style.width = `${Math.max(0, (runState.companheiro.sp / runState.companheiro.maxSp) * 100)}%`;
             }
 
-            // Exibe indicador visual de fase textual de turno
             const badge = document.getElementById('badgeFaseTurno');
             badge.innerText = `Turno: ${battleState.fase}`;
             if(battleState.fase === 'jogador') badge.className = "ml-2 bg-blue-600 px-1 rounded text-white font-bold uppercase text-[10px]";
@@ -421,66 +404,75 @@
             } else if (battleState.fase === 'derrota') {
                 menuAcoes.innerHTML = `<button onclick="mostrarTela('boot')" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Retornar ao Menu</button>`; return;
             } else if (battleState.fase === 'inimigo') {
-                menuAcoes.innerHTML = `<div class="p-4 text-center text-slate-500 font-mono animate-pulse mt-4 uppercase">Processando inteligência do Kaijin...</div>`; return;
+                menuAcoes.innerHTML = `<div class="p-4 text-center text-slate-500 font-mono animate-pulse mt-4 uppercase">Aguarde. Turno do Inimigo.</div>`; return;
             }
 
-            // SE FOR O TURNO DO COMPANHEIRO, SUBSTITUI TOTALMENTE O MENU PELOS GOLPES DELE (ESTILO FF)
             if (battleState.fase === 'companheiro') {
                 document.getElementById('btnPassarTurno').innerText = "Passar (Aliado)";
                 menuAcoes.innerHTML = `<div class="text-[11px] font-mono text-indigo-400 mb-2 uppercase font-bold tracking-wider">// Comandos de: ${runState.companheiro.name}</div>`;
                 runState.companheiro.ataques.forEach(a => {
-                    let btn = document.createElement('button');
-                    btn.className = 'ff-btn flex justify-between items-center mb-1 border-l-3 !border-indigo-500 bg-indigo-950/20';
-                    if (runState.companheiro.sp < a.custo) btn.disabled = true;
-                    btn.innerHTML = `<span>⚔️ ${a.nome}</span> <span class="text-purple-400 font-bold font-mono">${a.custo} SP</span>`;
-                    btn.onclick = () => usarAtaqueCompanheiro(a);
-                    menuAcoes.appendChild(btn);
+                    const cb = function() { usarAtaqueCompanheiro(a); };
+                    criarSlotAcao(a.nome, a.custo, false, cb, true); // true indica que é aliado
                 });
                 return;
             } else {
                 document.getElementById('btnPassarTurno').innerText = "Passar Turno";
             }
 
-            // Turno Normal do Jogador
             const fData = runState.rider.forms[runState.rider.formaAtual];
-            if (novaAba === 'ataques') fData.ataques.forEach(a => criarSlotAcao(a.nome, a.custo, false, () => usarAtaque(a)));
+            if (novaAba === 'ataques') fData.ataques.forEach(a => criarSlotAcao(a.nome, a.custo, false, function() { usarAtaque(a); }));
             else if (novaAba === 'habilidades') fData.habilidades.forEach(h => {
                 let travado = (battleState.habilidadesUsadas[h.nome] || 0) >= h.usoPorTurno;
-                criarSlotAcao(h.nome + (travado ? ' [Esgotado]' : ''), h.custo, travado, () => usarHabilidade(h));
+                criarSlotAcao(h.nome + (travado ? ' [Esgotado]' : ''), h.custo, travado, function() { usarHabilidade(h); });
             });
-            else if (novaAba === 'itens') criarSlotAcao(`Módulo de Cura`, 2, (battleState.itemUsado || runState.pocaoCount <= 0), () => usarItem());
-            else if (novaAba === 'formas') Object.values(runState.rider.forms).forEach(f => { if(f.id !== runState.rider.formaAtual) criarSlotAcao(`Henshin: ${f.name}`, 3, false, () => transformar(f.id)); });
+            else if (novaAba === 'itens') criarSlotAcao(`Módulo de Cura`, 2, (battleState.itemUsado || runState.pocaoCount <= 0), function() { usarItem(); });
+            else if (novaAba === 'formas') Object.values(runState.rider.forms).forEach(f => { if(f.id !== runState.rider.formaAtual) criarSlotAcao(`Henshin: ${f.name}`, 3, false, function() { transformar(f.id); }); });
         }
 
-        function criarSlotAcao(nome, custo, travadoForcado, cb) {
+        function criarSlotAcao(nome, custo, travadoForcado, callbackFn, isAliado = false) {
             const btn = document.createElement('button'); btn.className = 'ff-btn flex justify-between items-center mb-1 shrink-0';
-            if (runState.rider.sp < custo || travadoForcado) btn.disabled = true;
-            btn.innerHTML = `<span class="truncate pr-2">${nome}</span> <span class="text-cyan-500 font-bold shrink-0">${custo > 0 ? custo+' SP' : 'Livre'}</span>`;
-            btn.onclick = cb; document.getElementById('menuAcoes').appendChild(btn); return btn;
+            if (isAliado) { btn.classList.add('border-l-3', '!border-indigo-500', 'bg-indigo-950/20'); }
+            
+            // Verificação rigorosa para garantir que o SP correto é verificado
+            const spAtual = isAliado ? runState.companheiro.sp : runState.rider.sp;
+            if (spAtual < custo || travadoForcado) btn.disabled = true;
+            
+            btn.innerHTML = `<span class="truncate pr-2">${isAliado ? '⚔️ ' : ''}${nome}</span> <span class="text-cyan-500 font-bold shrink-0">${custo > 0 ? custo+' SP' : 'Livre'}</span>`;
+            
+            // Wrapper seguro no clique
+            btn.onclick = function() {
+                if (btn.disabled) return;
+                animarImpacto(isAliado ? 'spriteCompanheiro' : 'spriteRider', 'scale-90'); // Efeito visual no clique
+                callbackFn();
+            };
+            document.getElementById('menuAcoes').appendChild(btn);
+            return btn;
         }
 
         function usarAtaque(atk) {
-            if (battleState.fase !== 'jogador' || runState.rider.sp < atk.custo) return;
+            if (battleState.fase !== 'jogador') return;
+            if (runState.rider.sp < atk.custo) return;
             runState.rider.sp -= atk.custo; const d = Math.floor(atk.dano * runState.rider.buffAtk);
             battleState.enemy.hp -= d; runState.rider.buffAtk = 1;
             log(`Rider executou [${atk.nome}] ➔ Causa ${d} de dano.`, 'text-white'); 
-            animarImpacto('spriteRider'); verificarFim();
+            verificarFim();
         }
 
         function usarAtaqueCompanheiro(atk) {
-            if (battleState.fase !== 'companheiro' || runState.companheiro.sp < atk.custo) return;
+            if (battleState.fase !== 'companheiro') return;
+            if (runState.companheiro.sp < atk.custo) return;
             runState.companheiro.sp -= atk.custo;
             battleState.enemy.hp -= atk.dano;
             log(`${runState.companheiro.name} disparou [${atk.nome}] ➔ Causa ${atk.dano} de dano!`, 'text-indigo-200');
-            animarImpacto('spriteCompanheiro'); verificarFim();
+            verificarFim();
         }
 
         function usarHabilidade(hab) {
             if (battleState.fase !== 'jogador' || runState.rider.sp < hab.custo) return;
             battleState.habilidadesUsadas[hab.nome] = (battleState.habilidadesUsadas[hab.nome] || 0) + 1;
             runState.rider.sp -= hab.custo;
-            if(hab.efeito === 'foco_energia') { runState.rider.sp = Math.min(runState.rider.maxSp, runState.rider.sp + hab.valor); log(`Protocolo Foco calibrado: +${hab.valor} SP recarregados.`, 'text-cyan-300'); }
-            else if(hab.efeito === 'buff_atk') { runState.rider.buffAtk = hab.valor; log(`Multiplicador físico ajustado em x${hab.valor}.`, 'text-orange-300'); }
+            if(hab.efeito === 'foco_energia') { runState.rider.sp = Math.min(runState.rider.maxSp, runState.rider.sp + hab.valor); log(`Protocolo Foco: +${hab.valor} SP recarregados.`, 'text-cyan-300'); }
+            else if(hab.efeito === 'buff_atk') { runState.rider.buffAtk = hab.valor; log(`Multiplicador de dano calibrado em x${hab.valor}.`, 'text-orange-300'); }
             verificarFim();
         }
 
@@ -488,51 +480,39 @@
             if (battleState.fase !== 'jogador' || battleState.itemUsado || runState.pocaoCount <= 0 || runState.rider.sp < 2) return;
             battleState.itemUsado = true; runState.rider.sp -= 2; runState.pocaoCount--;
             runState.rider.hp = Math.min(runState.rider.maxHp, runState.rider.hp + 30);
-            log(`Injetado Módulo de Reparo ➔ +30 HP estruturais recuperados.`, 'text-emerald-300'); verificarFim();
+            log(`Injetado Módulo de Cura ➔ +30 HP estruturais recuperados.`, 'text-emerald-300'); verificarFim();
         }
 
         function transformar(novaForma) {
             if (battleState.fase !== 'jogador' || runState.rider.sp < 3) return;
             runState.rider.sp -= 3; runState.rider.formaAtual = novaForma;
-            log(`HENSHIN DRIVE: Modificando dados para ${runState.rider.forms[novaForma].name}.`, 'text-yellow-400 font-bold');
+            log(`HENSHIN: Forma alterada para ${runState.rider.forms[novaForma].name}.`, 'text-yellow-400 font-bold');
             atualizarHUD(); mudarAba('ataques');
         }
 
-        // CONTROLADOR DE FLUXO DE TURNOS (RIDER -> COMPANHEIRO -> INIMIGO)
         function passarTurno() {
             if (battleState.fase === 'jogador') {
-                // Se houver companheiro vivo, passa para a vez dele
                 if (runState.companheiro && runState.companheiro.hp > 0) {
-                    battleState.fase = 'companheiro';
-                    runState.companheiro.sp = runState.companheiro.maxSp; // Reseta o SP do aliado
-                    log(`Início do turno de suporte: ${runState.companheiro.name}.`, 'text-indigo-400 font-bold');
+                    battleState.fase = 'companheiro'; runState.companheiro.sp = runState.companheiro.maxSp;
+                    log(`Turno de suporte: ${runState.companheiro.name}.`, 'text-indigo-400 font-bold');
                     atualizarHUD(); mudarAba('ataques');
-                } else {
-                    // Pula direto para o inimigo se não houver aliado
-                    acionarTurnoInimigo();
-                }
-            } else if (battleState.fase === 'companheiro') {
-                acionarTurnoInimigo();
-            }
+                } else { acionarTurnoInimigo(); }
+            } else if (battleState.fase === 'companheiro') { acionarTurnoInimigo(); }
         }
 
         function acionarTurnoInimigo() {
-            log('Iniciando ciclo de processamento do Kaijin.', 'text-slate-500'); 
+            log('Iniciando ciclo do Kaijin...', 'text-slate-500'); 
             battleState.fase = 'inimigo'; mudarAba('ataques');
             
             setTimeout(() => {
                 if(battleState.enemy.hp > 0) {
                     const d = battleState.enemy.danoBase + Math.floor(Math.random() * 4);
+                    animarImpacto('spriteEnemy', 'scale-125');
                     
-                    // Inteligência Artificial do Inimigo: Escolhe quem atacar de forma aleatória se o aliado existir!
                     if (runState.companheiro && runState.companheiro.hp > 0 && Math.random() > 0.5) {
-                        runState.companheiro.hp -= d;
-                        log(`O Kaijin contra-atacou ${runState.companheiro.name} causando ${d} de dano!`, 'text-red-400');
-                        animarImpacto('spriteEnemy');
+                        runState.companheiro.hp -= d; log(`O Kaijin atacou ${runState.companheiro.name} causando ${d} de dano!`, 'text-red-400');
                     } else {
-                        runState.rider.hp -= d;
-                        log(`O Kaijin atacou seu Rider causando ${d} de dano!`, 'text-red-400');
-                        animarImpacto('spriteEnemy');
+                        runState.rider.hp -= d; log(`O Kaijin atacou você causando ${d} de dano!`, 'text-red-400');
                     }
                 }
                 setTimeout(() => {
@@ -540,32 +520,29 @@
                     if(battleState.enemy.hp > 0 && runState.rider.hp > 0) {
                         battleState.turno++; runState.rider.sp = runState.rider.maxSp; 
                         battleState.itemUsado = false; battleState.habilidadesUsadas = {};
-                        battleState.fase = 'jogador'; 
-                        log(`-- Turno de Combate Geral: Ciclo ${battleState.turno} --`, 'text-emerald-500 mt-2');
-                        atualizarHUD(); mudarAba('ataques');
+                        battleState.fase = 'jogador'; log(`-- Ciclo de Combate: Turno ${battleState.turno} --`, 'text-emerald-500 mt-2');
+                        atualizarHUD(); mudarAba(battleState.abaAtual);
                     }
                 }, 1000);
             }, 800);
         }
 
         function verificarFim() {
-            if (battleState.enemy.hp <= 0) { battleState.fase = 'vitoria'; log('CONCLUÍDO: Assinatura térmica do inimigo dissipada.', 'text-yellow-400 font-bold text-lg'); } 
-            else if (runState.rider.hp <= 0) { battleState.fase = 'derrota'; log('CRÍTICO: Sistema Vital do Rider Abortado.', 'text-red-500 font-bold text-lg'); }
+            if (battleState.enemy.hp <= 0) { battleState.fase = 'vitoria'; log('CONCLUÍDO: Alvo Neutralizado.', 'text-yellow-400 font-bold text-lg'); } 
+            else if (runState.rider.hp <= 0) { battleState.fase = 'derrota'; log('CRÍTICO: Rider Desconectado.', 'text-red-500 font-bold text-lg'); }
             atualizarHUD(); mudarAba(battleState.abaAtual);
         }
 
-        // ================= DRAFT RECOMPENSAS BALANCEADO =================
+        // ================= DRAFT DE CARTAS =================
         function irParaTelaRecompensa() {
             document.getElementById('txtTituloRecompensa').innerText = "Batalha Concluída!";
-            document.getElementById('txtDescricaoDraft').innerText = "> Selecione 1 Modificador de Ataque Estratégico:";
             document.getElementById('btnVoltarDraft').classList.remove('hidden');
             document.getElementById('recCategorias').classList.remove('hidden');
             document.getElementById('recDraft').classList.add('hidden');
             mostrarTela('recompensa');
         }
 
-        function vencerCombate() { prosseguirMapa(); } // Interface integrada direto no fluxo do mapa
-
+        function vencerCombate() { prosseguirMapa(); }
         function coletarRecompensaDireta(tipo) {
             if(tipo === 'maxhp') { runState.rider.maxHp += 15; runState.rider.hp += 15; mostrarToast("Core Expandido: +15 Max HP.", "border-blue-500 bg-blue-900 text-white"); } 
             else if (tipo === 'item') { runState.pocaoCount++; mostrarToast("Módulo de Cura adicionado.", "border-yellow-500 bg-slate-800 text-yellow-400"); }
@@ -574,7 +551,7 @@
 
         function adquirirAtaqueDraft(atk, forma) {
             runState.rider.forms[forma.id].ataques.push(atk);
-            mostrarToast(`Instalado com sucesso: [${atk.nome}] injetado na ${forma.name}!`, "border-emerald-500 bg-emerald-900 text-white");
+            mostrarToast(`Instalado com sucesso: [${atk.nome}] na ${forma.name}!`, "border-emerald-500 bg-emerald-900 text-white");
             prosseguirMapa();
         }
 
@@ -590,6 +567,7 @@
             }
 
             const container = document.getElementById('containerCartasDraft'); container.innerHTML = '';
+            document.getElementById('txtDescricaoDraft').innerText = "> Selecione 1 Modificador de Ataque Estratégico:";
             
             opcoesDraft.forEach(opcao => {
                 const btn = document.createElement('button');
