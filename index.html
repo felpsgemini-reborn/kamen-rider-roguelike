@@ -7,7 +7,6 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         *, *::before, *::after { box-sizing: border-box; user-select: none; }
@@ -56,12 +55,12 @@
                 
                 <form id="formAutenticacao" class="space-y-4 text-left">
                     <div>
-                        <label class="block font-mono text-[10px] uppercase text-slate-400 mb-1">Rider ID (Nome único)</label>
-                        <input type="text" id="inpUser" required class="w-full bg-slate-950 border border-slate-700 p-2.5 rounded text-white font-mono text-sm focus:outline-none focus:border-emerald-500" placeholder="ex: kuuga_fatec">
+                        <label class="block font-mono text-[10px] uppercase text-slate-400 mb-1">Rider ID</label>
+                        <input type="text" id="inpUser" required class="w-full bg-slate-950 border border-slate-700 p-2.5 rounded text-white font-mono text-sm focus:outline-none focus:border-emerald-500" placeholder="Digite: admin">
                     </div>
                     <div>
                         <label class="block font-mono text-[10px] uppercase text-slate-400 mb-1">Senha de Acesso</label>
-                        <input type="password" id="inpPass" required class="w-full bg-slate-950 border border-slate-700 p-2.5 rounded text-white font-mono text-sm focus:outline-none focus:border-emerald-500" placeholder="••••••••">
+                        <input type="password" id="inpPass" required class="w-full bg-slate-950 border border-slate-700 p-2.5 rounded text-white font-mono text-sm focus:outline-none focus:border-emerald-500" placeholder="Digite: 12345">
                     </div>
                     <button type="submit" id="btnAcessar" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold py-3 rounded uppercase tracking-wider border border-emerald-400 transition-colors">
                         Conectar ao Terminal
@@ -78,7 +77,7 @@
                 </div>
                 <div class="text-right">
                     <div class="text-yellow-400 font-mono font-bold bg-slate-950 px-4 py-2 border border-slate-800 rounded-lg text-sm md:text-base">
-                        🪙 Saldo Disponível: <span id="labMoedasPermanentes">0</span>
+                        🪙 Saldo: <span id="labMoedasPermanentes">0</span>
                     </div>
                 </div>
             </header>
@@ -86,7 +85,7 @@
             <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 items-start mb-6">
                 <div class="ff-menu p-4 border border-slate-700 flex flex-col h-full">
                     <div class="text-3xl mb-2">❤️</div>
-                    <h3 class="font-bold text-white text-sm md:text-base uppercase tracking-wide">Calibragem de Núcleo</h3>
+                    <h3 class="font-bold text-white text-sm md:text-base uppercase tracking-wide">Calibragem Core</h3>
                     <p class="text-[11px] text-slate-400 font-mono mt-1 mb-4 flex-1">Aumenta permanentemente o HP máximo inicial em +15 pontos por nível.</p>
                     <div class="text-xs font-mono mb-3 bg-slate-950/50 p-2 rounded border border-slate-800 text-slate-300">Nível Atual: <span id="lvlVida" class="text-cyan-400 font-bold">0/5</span></div>
                     <button onclick="comprarUpgrade('vida')" id="btnUpVida" class="w-full bg-slate-800 hover:bg-slate-700 font-mono text-xs text-white py-2 rounded font-bold uppercase tracking-wider border border-slate-600">Comprar por: 50 🪙</button>
@@ -94,31 +93,31 @@
 
                 <div class="ff-menu p-4 border border-slate-700 flex flex-col h-full">
                     <div class="text-3xl mb-2">⚡</div>
-                    <h3 class="font-bold text-white text-sm md:text-base uppercase tracking-wide">Otimização de Impacto</h3>
-                    <p class="text-[11px] text-slate-400 font-mono mt-1 mb-4 flex-1">Injeta +4 de dano fixo em todas as ações ofensivas do Rider clonado.</p>
+                    <h3 class="font-bold text-white text-sm md:text-base uppercase tracking-wide">Otimização Dano</h3>
+                    <p class="text-[11px] text-slate-400 font-mono mt-1 mb-4 flex-1">Injeta +4 de dano fixo em todas as ações ofensivas do Rider Base.</p>
                     <div class="text-xs font-mono mb-3 bg-slate-950/50 p-2 rounded border border-slate-800 text-slate-300">Nível Atual: <span id="lvlDano" class="text-cyan-400 font-bold">0/5</span></div>
                     <button onclick="comprarUpgrade('dano')" id="btnUpDano" class="w-full bg-slate-800 hover:bg-slate-700 font-mono text-xs text-white py-2 rounded font-bold uppercase tracking-wider border border-slate-600">Comprar por: 60 🪙</button>
                 </div>
 
                 <div class="ff-menu p-4 border-2 border-dashed border-slate-700 flex flex-col h-full">
                     <div class="text-3xl mb-2">🎛️</div>
-                    <h3 class="font-bold text-white text-sm md:text-base uppercase tracking-wide">Parâmetros da Run</h3>
-                    <p class="text-[11px] text-slate-400 font-mono mt-1 mb-4 flex-1">Dificuldades maiores aumentam a força dos Kaijins, mas multiplicam o ganho de Moedas Rider.</p>
+                    <h3 class="font-bold text-white text-sm md:text-base uppercase tracking-wide">Parâmetros de Run</h3>
+                    <p class="text-[11px] text-slate-400 font-mono mt-1 mb-4 flex-1">Dificuldades maiores fortalecem Kaijins, mas aumentam o ganho de Moedas.</p>
                     <div class="w-full space-y-2">
                         <label class="block font-mono text-[9px] uppercase text-slate-400">Seletor de Dificuldade:</label>
                         <select id="selectDificuldade" onchange="alterarDificuldadeVisual()" class="w-full bg-slate-950 border border-slate-700 p-2 rounded text-white font-mono text-xs focus:outline-none">
-                            <option value="0">Dificuldade: Normal (x1.0)</option>
-                            <option value="1">Dificuldade: Hard (x1.5)</option>
-                            <option value="2">Dificuldade: Clímax (x2.0)</option>
+                            <option value="0">Normal (Dano x1.0)</option>
+                            <option value="1">Hard (Dano x1.4)</option>
+                            <option value="2">Clímax (Dano x1.8)</option>
                         </select>
                     </div>
                 </div>
             </div>
 
             <footer class="mt-auto pt-4 border-t border-slate-800 flex justify-between items-center shrink-0">
-                <button onclick="desconectarTerminal()" class="text-slate-500 hover:text-red-400 text-xs font-mono uppercase tracking-wider transition-colors">Desconectar</button>
+                <button onclick="desconectarTerminal()" class="text-slate-500 hover:text-red-400 text-xs font-mono uppercase tracking-wider transition-colors">Sair (Logoff)</button>
                 <button onclick="iniciarRun()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-mono font-bold px-8 py-3.5 rounded shadow-lg uppercase tracking-widest border border-emerald-400 text-sm transform transition-transform active:scale-95">
-                    Iniciar Transmissão (Run)
+                    Iniciar Transmissão
                 </button>
             </footer>
         </div>
@@ -230,11 +229,6 @@
     </div>
 
     <script>
-        // CONFIGURAÇÕES DIRETAS DO SEU NOVO PROJETO SUPABASE
-        const supabaseUrl = 'https://cehzhboxhkrfvqzmkqsf.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlaHpiaG94aGtyZnZxem1rcXNmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0NTg0ODUsImV4cCI6MjA5OTAzNDQ4NX0.gdk-gtq82Hs9pmQlxT_4A_Gk9DCUEbIsGTVSLbvO8QQ';
-        const db = supabase.createClient(supabaseUrl, supabaseKey);
-
         window.onerror = function(message) { mostrarToast(`ERRO: ${message}`, 'bg-red-600 border-white text-white font-bold'); return false; };
 
         function mostrarToast(mensagem, corClasses = 'bg-slate-800 border-slate-600 text-white') {
@@ -242,7 +236,8 @@
             if(!container) return;
             const toast = document.createElement('div');
             toast.className = `toast-enter p-3 rounded shadow-xl border-l-4 font-mono text-xs md:text-sm ${corClasses}`;
-            toast.innerHTML = mensaje = mensagem; container.appendChild(toast);
+            toast.innerHTML = mensagem; 
+            container.appendChild(toast);
             setTimeout(() => {
                 toast.classList.replace('toast-enter', 'opacity-0'); toast.style.transition = 'all 0.3s';
                 toast.style.transform = 'translateX(100%)'; setTimeout(() => toast.remove(), 300);
@@ -283,84 +278,57 @@
             ]
         };
 
-        // ESTADOS DE CONTROLE EM NUVEM (META-PROGRESSÃO)
-        let sessionUser = null;
+        // ESTADOS (SUBSTITUIÇÃO DO SUPABASE PELO CACHE LOCAL DE TESTES)
         let metaState = { moedas_permanentes: 0, upgrade_vida: 0, upgrade_dano: 0, dificuldade_selecionada: 0 };
-
         let runState = { andarAtual: 0, mapa: [], moedas: 0, pocaoCount: 1, rider: null, companheiro: null };
         let battleState = { fase: 'jogador', turno: 1, itemUsado: false, habilidadesUsadas: {}, abaAtual: 'ataques', enemy: null };
 
-        // DOM de Telas
         const telasDOM = {
-            login: document.getElementById('telaLogin'),
-            lab: document.getElementById('telaLaboratorio'),
-            mapa: document.getElementById('telaMapa'),
-            batalha: document.getElementById('telaBatalha'),
+            login: document.getElementById('telaLogin'), lab: document.getElementById('telaLaboratorio'),
+            mapa: document.getElementById('telaMapa'), batalha: document.getElementById('telaBatalha'),
             recompensa: document.getElementById('telaRecompensa')
         };
         function trocarTela(nome) { Object.values(telasDOM).forEach(el => el.classList.add('hidden')); telasDOM[nome].classList.remove('hidden'); }
 
-        // ================= SISTEMA DE AUTENTICAÇÃO INTEGRADO =================
-        document.getElementById('formAutenticacao').addEventListener('submit', async (e) => {
+        // ================= SISTEMA DE LOGIN MOCK (ADMIN) =================
+        document.getElementById('formAutenticacao').addEventListener('submit', (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btnAcessar');
-            btn.innerText = "Sincronizando link..."; btn.disabled = true;
-
-            const username = document.getElementById('inpUser').value.trim().toLowerCase();
+            const user = document.getElementById('inpUser').value.trim().toLowerCase();
             const pass = document.getElementById('inpPass').value;
-            const fakeEmail = `${username}@krgame.com`; // Transforma o username em formato aceito pelo Supabase Auth
 
-            // Tenta logar
-            const { data: signData, error: signError } = await db.auth.signInWithPassword({ email: fakeEmail, password: pass });
-            
-            if (signError) {
-                // Se der erro porque não existe, tenta registrar automaticamente! (Onboarding limpo)
-                if (signError.message.includes("Invalid login credentials")) {
-                    const { data: regData, error: regError } = await db.auth.signUp({ email: fakeEmail, password: pass });
-                    if(regError) {
-                        mostrarToast(`Falha no Registro: ${regError.message}`, 'bg-red-600 text-white border-white');
-                        btn.innerText = "Conectar ao Terminal"; btn.disabled = false; return;
-                    }
-                    sessionUser = regData.user;
-                    mostrarToast("Nova assinatura Rider criada com sucesso!", "bg-blue-600 text-white border-white");
-                    await instanciarNovoSave();
-                } else {
-                    mostrarToast(`Erro de rede: ${signError.message}`, 'bg-red-600 text-white border-white');
-                    btn.innerText = "Conectar ao Terminal"; btn.disabled = false; return;
-                }
+            if (user === 'admin' && pass === '12345') {
+                mostrarToast("Acesso Autorizado. Bem-vindo, Admin.", "bg-emerald-600 text-white border-white");
+                carregarDadosLocais();
+                document.getElementById('labRiderName').innerText = "ADMIN_TESTER";
+                trocarTela('lab');
             } else {
-                sessionUser = signData.user;
-                mostrarToast("Protocolo Rider carregado da nuvem.", "bg-emerald-600 text-white border-white");
+                mostrarToast("Acesso Negado! Use: admin / 12345", "bg-red-600 text-white border-white");
             }
-
-            await carregarDadosNuvem();
-            btn.innerText = "Conectar ao Terminal"; btn.disabled = false;
         });
 
-        async function instanciarNovoSave() {
-            const novoSave = { id: sessionUser.id, moedas_permanentes: 0, upgrade_vida: 0, upgrade_dano: 0, diculdade_selecionada: 0 };
-            await db.from('player_saves').insert([novoSave]);
+        function carregarDadosLocais() {
+            const saved = localStorage.getItem('kr_admin_meta');
+            if (saved) {
+                metaState = JSON.parse(saved);
+                if (metaState.dificuldade_selecionada === undefined) metaState.dificuldade_selecionada = 0;
+            } else {
+                metaState = { moedas_permanentes: 0, upgrade_vida: 0, upgrade_dano: 0, dificuldade_selecionada: 0 };
+            }
+            document.getElementById('selectDificuldade').value = metaState.dificuldade_selecionada;
+            atualizarInterfaceLaboratorio();
         }
 
-        async function carregarDadosNuvem() {
-            if(!sessionUser) return;
-            const { data, error } = await db.from('player_saves').select('*').eq('id', sessionUser.id).single();
-            if(!error && data) {
-                metaState = data;
-                document.getElementById('labRiderName').innerText = sessionUser.email.split('@')[0].toUpperCase();
-                document.getElementById('selectDificuldade').value = metaState.dificuldade_selecionada;
-                atualizarInterfaceLaboratorio();
-                trocarTela('lab');
-            }
+        function salvarDadosLocais() {
+            localStorage.setItem('kr_admin_meta', JSON.stringify(metaState));
         }
 
         function desconectarTerminal() {
-            db.auth.signOut(); sessionUser = null;
+            document.getElementById('inpUser').value = '';
             document.getElementById('inpPass').value = '';
             trocarTela('login');
         }
 
-        // ================= TERMINAL DO LABORATÓRIO (UPGRADES) =================
+        // ================= LABORATÓRIO (UPGRADES) =================
         function atualizarInterfaceLaboratorio() {
             document.getElementById('labMoedasPermanentes').innerText = metaState.moedas_permanentes;
             
@@ -375,7 +343,7 @@
             else { btnDano.innerText = `Calibrar: ${60 * (metaState.upgrade_dano + 1)} 🪙`; btnDano.disabled = false; }
         }
 
-        async function comprarUpgrade(tipo) {
+        function comprarUpgrade(tipo) {
             if (tipo === 'vida') {
                 let custo = 50 * (metaState.upgrade_vida + 1);
                 if (metaState.moedas_permanentes >= custo && metaState.upgrade_vida < 5) {
@@ -389,25 +357,23 @@
                     mostrarToast("Calibragem ofensiva estruturada (+4 Dano)!");
                 } else { mostrarToast("Moedas insuficientes!", "bg-yellow-600"); return; }
             }
-            
-            // Sincroniza o upgrade direto no Supabase
-            await db.from('player_saves').update(metaState).eq('id', sessionUser.id);
+            salvarDadosLocais();
             atualizarInterfaceLaboratorio();
         }
 
-        async function alterarDificuldadeVisual() {
+        function alterarDificuldadeVisual() {
             metaState.dificuldade_selecionada = parseInt(document.getElementById('selectDificuldade').value);
-            await db.from('player_saves').update({ dificuldade_selecionada: metaState.dificuldade_selecionada }).eq('id', sessionUser.id);
+            salvarDadosLocais();
             mostrarToast(`Parâmetros de simulação definidos.`);
         }
 
-        // ================= LOOP DO MAPA E ENGINE PRINCIPAL =================
+        // ================= LOOP DO MAPA E ENGINE =================
         function iniciarRun() {
             runState.moedas = 0; runState.andarAtual = 0; runState.pocaoCount = 1; runState.companheiro = null;
             runState.rider = JSON.parse(JSON.stringify(DB_RIDERS.kuuga));
             runState.rider.formaAtual = 'growing';
             
-            // APLICAÇÃO DOS UPGRADES DO SUPABASE NO COMPONENTE CLONADO
+            // APLICAÇÃO DOS UPGRADES SALVOS
             runState.rider.maxHp = runState.rider.baseHp + (metaState.upgrade_vida * 15);
             runState.rider.hp = runState.rider.maxHp;
             runState.rider.maxSp = runState.rider.maxEnergy;
@@ -474,25 +440,19 @@
         function prosseguirMapa() {
             runState.andarAtual++;
             if (runState.andarAtual >= 10) {
-                mostrarToast("SISTEMA CONCLUÍDO! COMBATE ENCERRADO.", "border-emerald-500 bg-emerald-900 text-white font-bold text-lg");
+                mostrarToast("SISTEMA CONCLUÍDO! VITÓRIA!", "border-emerald-500 bg-emerald-900 text-white font-bold text-lg");
                 finalizarRunGlobal(true);
             } else { renderizarMapa(); trocarTela('mapa'); }
         }
 
-        // SINCRONIZAÇÃO EM NUVEM APÓS A MORTE OU VITÓRIA
-        async function finalizarRunGlobal(vitoria) {
-            // Fator de escala por dificuldade
-            let multiplicador = 1 + (metaState.dificuldade_selecionada * 0.5);
-            let moedasFinaisGanhas = Math.floor(runState.moedas * (vitoria ? 1.0 : 0.5) * multiplicador);
-
-            metaState.moedas_permanentes += moedasFinaisGanhas;
-            
-            mostrarToast(`Run finalizada. Sincronizando +${moedasFinaisGanhas} Moedas Rider para a Base.`, "bg-yellow-600 font-bold");
-            
-            // Grava os dados finais em nuvem no Supabase
-            await db.from('player_saves').update({ moedas_permanentes: metaState.moedas_permanentes }).eq('id', sessionUser.id);
-            
-            await carregarDadosNuvem(); // Força recarregar os dados na tela do laboratório
+        function finalizarRunGlobal(vitoria) {
+            let multiplicador = 1 + (metaState.dificuldade_selecionada * 0.4);
+            let moedasFinais = Math.floor(runState.moedas * (vitoria ? 1.0 : 0.5) * multiplicador);
+            metaState.moedas_permanentes += moedasFinais;
+            mostrarToast(`Run finalizada. Transferindo +${moedasFinais} Moedas Rider para a Base.`, "bg-yellow-600 font-bold");
+            salvarDadosLocais();
+            carregarDadosLocais();
+            trocarTela('lab');
         }
 
         // ================= COMPANHEIROS =================
@@ -518,7 +478,7 @@
                 `;
                 btn.onclick = () => {
                     runState.companheiro = JSON.parse(JSON.stringify(comp));
-                    mostrarToast(`Aliado Conectado!`, "border-indigo-500 bg-indigo-950 text-white");
+                    mostrarToast(`Aliado Conectado! ${comp.name} juntou-se a você.`, "border-indigo-500 bg-indigo-950 text-white");
                     prosseguirMapa();
                 };
                 container.appendChild(btn);
@@ -529,7 +489,7 @@
             trocarTela('recompensa');
         }
 
-        // ================= COMBATE COMBATE =================
+        // ================= COMBATE =================
         function log(msg, cor = 'text-slate-300') {
             const p = document.createElement('p'); p.className = `mb-1 ${cor}`; p.innerText = `> ${msg}`;
             const bl = document.getElementById('battleLog'); bl.appendChild(p); bl.scrollTop = bl.scrollHeight;
@@ -540,7 +500,6 @@
             runState.rider.formaAtual = 'growing'; runState.rider.sp = runState.rider.maxSp; runState.rider.buffAtk = 1;
             if(runState.companheiro) runState.companheiro.sp = runState.companheiro.maxSp;
 
-            // FATOR DIFICULDADE: Escala o HP e Dano dos inimigos baseado na dificuldade escolhida no laboratório!
             let difMult = 1 + (metaState.dificuldade_selecionada * 0.4);
             let baseHpInimigo = tipo === 'chefe' ? 160 : 50 + (runState.andarAtual * 6);
 
@@ -581,6 +540,13 @@
                 document.getElementById('barCompHp').style.width = `${Math.max(0, (runState.companheiro.hp / runState.companheiro.maxHp) * 100)}%`;
                 document.getElementById('barCompSp').style.width = `${Math.max(0, (runState.companheiro.sp / runState.companheiro.maxSp) * 100)}%`;
             }
+
+            const badge = document.getElementById('badgeFaseTurno');
+            badge.innerText = `Turno: ${battleState.fase}`;
+            if(battleState.fase === 'jogador') badge.className = "ml-2 bg-blue-600 px-1 rounded text-white font-bold uppercase text-[10px]";
+            else if(battleState.fase === 'companheiro') badge.className = "ml-2 bg-indigo-600 px-1 rounded text-white font-bold uppercase text-[10px]";
+            else badge.className = "ml-2 bg-purple-600 px-1 rounded text-white font-bold uppercase text-[10px]";
+
             const ib = document.getElementById('itemStatus'); ib.innerText = runState.pocaoCount;
         }
 
@@ -594,10 +560,9 @@
             if (battleState.fase === 'vitoria') {
                 menuAcoes.innerHTML = `<button onclick="irParaTelaRecompensa()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Acessar Arquivos de Loot</button>`; return;
             } else if (battleState.fase === 'derrota') {
-                // SE MORRER: O botão redireciona para sincronizar moedas e ir pro laboratório
                 menuAcoes.innerHTML = `<button onclick="finalizarRunGlobal(false)" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Sincronizar Falha e Renascer</button>`; return;
             } else if (battleState.fase === 'inimigo') {
-                menuAcoes.innerHTML = `<div class="p-4 text-center text-slate-500 font-mono animate-pulse mt-4 uppercase">Processando resposta inimiga...</div>`; return;
+                menuAcoes.innerHTML = `<div class="p-4 text-center text-slate-500 font-mono animate-pulse mt-4 uppercase">Aguarde. Turno do Inimigo.</div>`; return;
             }
 
             if (battleState.fase === 'companheiro') {
@@ -633,11 +598,8 @@
 
         function usarAtaque(atk) {
             if (battleState.fase !== 'jogador' || runState.rider.sp < atk.custo) return;
-            runState.rider.sp -= atk.custo;
-            
-            // APLICAÇÃO DO UPGRADE DE DANO FIXO DO SUPABASE
+            runState.rider.sp -= atk.custo; 
             const d = Math.floor((atk.dano + (metaState.upgrade_dano * 4)) * runState.rider.buffAtk);
-            
             battleState.enemy.hp -= d; runState.rider.buffAtk = 1;
             log(`Rider executou [${atk.nome}] ➔ Causa ${d} de dano.`, 'text-white'); verificarFim();
         }
@@ -667,7 +629,7 @@
         function transformar(novaForma) {
             if (battleState.fase !== 'jogador' || runState.rider.sp < 3) return;
             runState.rider.sp -= 3; runState.rider.formaAtual = novaForma;
-            log(`HENSHIN: Sistema alterado para ${runState.rider.forms[novaForma].name}.`, 'text-yellow-400 font-bold');
+            log(`HENSHIN: Forma alterada para ${runState.rider.forms[novaForma].name}.`, 'text-yellow-400 font-bold');
             atualizarHUD(); mudarAba('ataques');
         }
 
@@ -690,15 +652,16 @@
                     if (runState.companheiro && runState.companheiro.hp > 0 && Math.random() > 0.5) {
                         runState.companheiro.hp -= d; log(`O Kaijin atacou ${runState.companheiro.name} causando ${d} de dano!`, 'text-red-400');
                     } else {
-                        runState.rider.hp -= d; log(`O Kaijin atacou seu Rider causando ${d} de dano!`, 'text-red-400');
+                        runState.rider.hp -= d; log(`O Kaijin atacou você causando ${d} de dano!`, 'text-red-400');
                     }
                 }
                 setTimeout(() => {
                     verificarFim(); 
                     if(battleState.enemy.hp > 0 && runState.rider.hp > 0) {
-                        battleState.turno++; runState.rider.sp = runState.rider.maxSp; battleState.itemUsado = false; battleState.habilidadesUsadas = {};
+                        battleState.turno++; runState.rider.sp = runState.rider.maxSp; 
+                        battleState.itemUsado = false; battleState.habilidadesUsadas = {};
                         battleState.fase = 'jogador'; log(`-- Ciclo de Combate: Turno ${battleState.turno} --`, 'text-emerald-500 mt-2');
-                        atualizarHUD(); mudarAba('ataques');
+                        atualizarHUD(); mudarAba(battleState.abaAtual);
                     }
                 }, 1000);
             }, 800);
@@ -718,7 +681,6 @@
             trocarTela('recompensa');
         }
 
-        function vencerCombate() { prosseguirMapa(); }
         function coletarRecompensaDireta(tipo) {
             if(tipo === 'maxhp') { runState.rider.maxHp += 15; runState.rider.hp += 15; mostrarToast("Core Expandido: +15 Max HP.", "border-blue-500 bg-blue-900 text-white"); } 
             else if (tipo === 'item') { runState.pocaoCount++; mostrarToast("Módulo de Cura adicionado.", "border-yellow-500 bg-slate-800 text-yellow-400"); }
@@ -731,13 +693,7 @@
             prosseguirMapa();
         }
 
-        function prevenirErros() {
-            if(!runState.rider || !runState.rider.forms) return false;
-            return true;
-        }
-
         function prepararDraftAtaque() {
-            if(!prevenirErros()) return;
             const formasDisponiveis = Object.values(runState.rider.forms);
             const poolEmbaralhada = [...DB_ATAQUES_POOL].sort(() => 0.5 - Math.random());
             const opcoesDraft = [];
@@ -759,7 +715,7 @@
                         <h3 class="font-bold text-white text-sm md:text-base">${opcao.ataque.nome}</h3>
                         <span class="text-cyan-400 font-bold text-xs bg-slate-800 px-2 py-1 rounded border border-slate-700">${opcao.ataque.custo} SP</span>
                     </div>
-                    <div class="text-red-400 font-mono text-xs mb-2 font-bold">Dano: ${opcao.ataque.dano} Dmg</div>
+                    <div class="text-red-400 font-mono text-xs mb-2 font-bold">Dano Atualizado: ${opcao.ataque.dano} Dmg</div>
                     <div class="mb-3 inline-block bg-indigo-950 border border-indigo-500 text-indigo-300 font-bold px-2 py-0.5 text-[10px] rounded uppercase tracking-wider">
                         Destino: ${opcao.forma.name}
                     </div>
@@ -768,6 +724,7 @@
                 btn.onclick = () => adquirirAtaqueDraft(opcao.ataque, opcao.forma);
                 container.appendChild(btn);
             });
+
             document.getElementById('recCategorias').classList.add('hidden'); document.getElementById('recDraft').classList.remove('hidden');
         }
 
