@@ -48,11 +48,11 @@
 
     <div id="gameContainer" class="w-full max-w-5xl h-full max-h-[700px] flex flex-col overflow-hidden relative border border-slate-700 rounded-xl bg-slate-900 shadow-2xl">
         
+        <!-- TELA 1: LOGIN -->
         <div id="telaLogin" class="flex-1 flex flex-col items-center justify-center p-6 text-center">
             <div class="ff-menu p-8 w-full max-w-sm border border-slate-700 rounded-xl shadow-2xl">
                 <h1 class="text-3xl font-black text-emerald-400 uppercase tracking-wider mb-2">Henshin Login</h1>
                 <p class="text-slate-400 text-xs font-mono uppercase tracking-widest mb-6">// Módulo Local</p>
-                
                 <form id="formAutenticacao" class="space-y-4 text-left">
                     <div>
                         <label class="block font-mono text-[10px] uppercase text-slate-400 mb-1">Rider ID</label>
@@ -69,29 +69,23 @@
             </div>
         </div>
 
+        <!-- TELA 2: MENU PRINCIPAL -->
         <div id="telaMenuPrincipal" class="hidden flex-1 flex flex-col items-center justify-center p-6 text-center bg-gradient-to-b from-slate-900 to-slate-950">
             <div class="mb-10">
                 <h1 class="text-4xl md:text-5xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 uppercase">Kamen Rider</h1>
                 <h2 class="text-xs md:text-sm font-mono tracking-[0.4em] text-slate-400 uppercase mt-1">Chronicles Roguelike // Central</h2>
             </div>
-            
             <div class="space-y-3 w-full max-w-xs ff-menu p-4">
-                <button onclick="iniciarRun()" class="ff-btn !text-center !text-white bg-emerald-600 hover:bg-emerald-500 font-bold py-3 rounded border border-emerald-400 text-xs tracking-widest">
-                    ▶️ Missão Principal
-                </button>
-                <button onclick="abrirLaboratorio()" class="ff-btn !text-center !text-cyan-400 bg-slate-800 hover:bg-slate-700 font-bold py-3 rounded border border-slate-600 text-xs tracking-widest">
-                    🧪 Laboratório Core
-                </button>
-                <button disabled class="ff-btn !text-center !text-slate-600 bg-slate-950 font-bold py-3 rounded border border-slate-900 text-xs tracking-widest cursor-not-allowed opacity-50">
-                    👥 Arquivos Rider
-                </button>
-                
+                <button onclick="iniciarRun()" class="ff-btn !text-center !text-white bg-emerald-600 hover:bg-emerald-500 font-bold py-3 rounded border border-emerald-400 text-xs tracking-widest">▶️ Missão Principal</button>
+                <button onclick="abrirLaboratorio()" class="ff-btn !text-center !text-cyan-400 bg-slate-800 hover:bg-slate-700 font-bold py-3 rounded border border-slate-600 text-xs tracking-widest">🧪 Laboratório Core</button>
+                <button disabled class="ff-btn !text-center !text-slate-600 bg-slate-950 font-bold py-3 rounded border border-slate-900 text-xs tracking-widest cursor-not-allowed opacity-50">👥 Arquivos Rider</button>
                 <div class="pt-2 border-t border-slate-800">
                     <button onclick="desconectarTerminal()" class="w-full text-center text-slate-500 hover:text-red-400 font-mono text-[11px] uppercase transition-colors">Desconectar Sistema</button>
                 </div>
             </div>
         </div>
 
+        <!-- TELA 3: LABORATÓRIO -->
         <div id="telaLaboratorio" class="hidden flex-1 flex flex-col p-4 md:p-6 overflow-y-auto">
             <header class="border-b border-slate-700 pb-4 mb-6 flex justify-between items-center shrink-0">
                 <div>
@@ -99,12 +93,9 @@
                     <p class="text-xs font-mono text-slate-400">Status: <span class="text-emerald-400 font-bold">ONLINE</span></p>
                 </div>
                 <div class="text-right">
-                    <div class="text-yellow-400 font-mono font-bold bg-slate-950 px-4 py-2 border border-slate-800 rounded-lg text-sm md:text-base">
-                        🪙 Saldo: <span id="labMoedasPermanentes">0</span>
-                    </div>
+                    <div class="text-yellow-400 font-mono font-bold bg-slate-950 px-4 py-2 border border-slate-800 rounded-lg text-sm md:text-base">🪙 Saldo: <span id="labMoedasPermanentes">0</span></div>
                 </div>
             </header>
-
             <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 items-start mb-6">
                 <div class="ff-menu p-4 border border-slate-700 flex flex-col h-full">
                     <div class="text-3xl mb-2">❤️</div>
@@ -113,7 +104,6 @@
                     <div class="text-xs font-mono mb-3 bg-slate-950/50 p-2 rounded border border-slate-800 text-slate-300">Nível: <span id="lvlVida" class="text-cyan-400 font-bold">0/5</span></div>
                     <button onclick="comprarUpgrade('vida')" id="btnUpVida" class="w-full bg-slate-800 hover:bg-slate-700 font-mono text-xs text-white py-2 rounded font-bold uppercase tracking-wider border border-slate-600">Comprar: 50 🪙</button>
                 </div>
-
                 <div class="ff-menu p-4 border border-slate-700 flex flex-col h-full">
                     <div class="text-3xl mb-2">⚡</div>
                     <h3 class="font-bold text-white text-sm md:text-base uppercase tracking-wide">Otimização Dano</h3>
@@ -121,7 +111,6 @@
                     <div class="text-xs font-mono mb-3 bg-slate-950/50 p-2 rounded border border-slate-800 text-slate-300">Nível: <span id="lvlDano" class="text-cyan-400 font-bold">0/5</span></div>
                     <button onclick="comprarUpgrade('dano')" id="btnUpDano" class="w-full bg-slate-800 hover:bg-slate-700 font-mono text-xs text-white py-2 rounded font-bold uppercase tracking-wider border border-slate-600">Comprar: 60 🪙</button>
                 </div>
-
                 <div class="ff-menu p-4 border-2 border-dashed border-slate-700 flex flex-col h-full">
                     <div class="text-3xl mb-2">🎛️</div>
                     <h3 class="font-bold text-white text-sm md:text-base uppercase tracking-wide">Diretriz da Run</h3>
@@ -136,12 +125,12 @@
                     </div>
                 </div>
             </div>
-
             <footer class="mt-auto pt-4 border-t border-slate-800 flex justify-start shrink-0">
                 <button onclick="voltarParaMenuPrincipal()" class="bg-slate-800 hover:bg-slate-700 text-white font-mono text-xs font-bold px-6 py-2 rounded uppercase border border-slate-600">Retornar</button>
             </footer>
         </div>
 
+        <!-- TELA 4: MAPA -->
         <div id="telaMapa" class="hidden flex-1 flex flex-col min-h-0 relative">
             <header class="bg-slate-800 p-4 border-b border-slate-700 flex justify-between items-center z-10 shrink-0 shadow-lg">
                 <h2 class="font-bold text-emerald-400 font-mono tracking-widest uppercase text-sm md:text-base">Setor de Exploração</h2>
@@ -150,6 +139,7 @@
             <div class="flex-1 overflow-y-auto flex flex-col-reverse justify-start items-center p-8 gap-12 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGRpdiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjojMGYxNzJhO2hlaWdodDoxMDAlO3dpZHRoOjEwMCU7Ij48L2Rpdj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxIiBmaWxsPSIjMzM0MTU1Ii8+PC9zdmc+')] bg-repeat" id="mapContainer"></div>
         </div>
 
+        <!-- TELA 5: RECOMPENSA -->
         <div id="telaRecompensa" class="hidden flex-1 flex flex-col items-center justify-center p-4 md:p-6 bg-slate-900/95 z-20 absolute inset-0">
             <h2 class="text-2xl md:text-3xl font-black text-yellow-400 mb-2 uppercase text-center" id="txtTituloRecompensa">Batalha Concluída!</h2>
             <div id="recCategorias" class="w-full max-w-3xl flex flex-col items-center">
@@ -180,55 +170,79 @@
             </div>
         </div>
 
+        <!-- TELA 6: BATALHA (COM ESCUDOS) -->
         <div id="telaBatalha" class="hidden flex-1 flex flex-col gap-2 p-2">
             <header class="bg-slate-800 border border-slate-700 p-3 rounded flex flex-col md:flex-row justify-between items-start md:items-end gap-2 shadow-lg shrink-0">
+                
+                <!-- HUD PARTY (Rider + Companheiro) -->
                 <div class="flex gap-4 flex-wrap flex-1 w-full">
-                    <div class="bg-slate-900/50 p-2 rounded border border-slate-700 min-w-[140px]">
+                    <div class="bg-slate-900/50 p-2 rounded border border-slate-700 min-w-[140px] relative">
                         <h2 class="font-bold text-xs md:text-sm text-white tracking-wide truncate" id="hudRiderName">Kuuga</h2>
                         <div class="flex flex-col gap-1 mt-1">
-                            <div>
-                                <div class="flex justify-between text-[9px] uppercase font-bold text-red-400"><span>HP</span> <span id="hudHp">100/100</span></div>
-                                <div class="w-full bg-slate-950 h-1.5 rounded"><div id="barHp" class="bg-red-500 h-1.5 rounded transition-all duration-300"></div></div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex justify-between text-[9px] uppercase font-bold text-red-400 w-full"><span>HP</span> <span id="hudHp">100/100</span></div>
+                                <!-- INDICADOR DE ESCUDO DO RIDER -->
+                                <span id="hudRiderShield" class="text-[10px] font-bold text-blue-300 ml-2 hidden bg-blue-900/50 px-1 rounded">🛡️ 0</span>
                             </div>
-                            <div>
-                                <div class="flex justify-between text-[9px] uppercase font-bold text-cyan-400"><span>EN</span> <span id="hudSp">10/10</span></div>
-                                <div class="w-full bg-slate-950 h-1.5 rounded"><div id="barSp" class="bg-cyan-500 h-1.5 rounded transition-all duration-300"></div></div>
-                            </div>
+                            <div class="w-full bg-slate-950 h-1.5 rounded mb-1"><div id="barHp" class="bg-red-500 h-1.5 rounded transition-all duration-300"></div></div>
+                            
+                            <div class="flex justify-between text-[9px] uppercase font-bold text-cyan-400 w-full"><span>EN</span> <span id="hudSp">10/10</span></div>
+                            <div class="w-full bg-slate-950 h-1.5 rounded"><div id="barSp" class="bg-cyan-500 h-1.5 rounded transition-all duration-300"></div></div>
                         </div>
                     </div>
-                    <div id="hudBoxCompanheiro" class="bg-indigo-950/40 p-2 rounded border border-indigo-800/60 min-w-[140px] hidden">
+                    
+                    <div id="hudBoxCompanheiro" class="bg-indigo-950/40 p-2 rounded border border-indigo-800/60 min-w-[140px] hidden relative">
                         <h2 class="font-bold text-xs md:text-sm text-indigo-300 tracking-wide truncate" id="hudCompName">Nenhum</h2>
                         <div class="flex flex-col gap-1 mt-1">
-                            <div>
-                                <div class="flex justify-between text-[9px] uppercase font-bold text-emerald-400"><span>HP</span> <span id="hudCompHp">0/0</span></div>
-                                <div class="w-full bg-slate-950 h-1.5 rounded"><div id="barCompHp" class="bg-emerald-500 h-1.5 rounded transition-all duration-300"></div></div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex justify-between text-[9px] uppercase font-bold text-emerald-400 w-full"><span>HP</span> <span id="hudCompHp">0/0</span></div>
+                                <!-- INDICADOR DE ESCUDO DO COMPANHEIRO -->
+                                <span id="hudCompShield" class="text-[10px] font-bold text-blue-300 ml-2 hidden bg-blue-900/50 px-1 rounded">🛡️ 0</span>
                             </div>
-                            <div>
-                                <div class="flex justify-between text-[9px] uppercase font-bold text-purple-400"><span>EN</span> <span id="hudCompSp">0/0</span></div>
-                                <div class="w-full bg-slate-950 h-1.5 rounded"><div id="barCompSp" class="bg-purple-500 h-1.5 rounded transition-all duration-300"></div></div>
-                            </div>
+                            <div class="w-full bg-slate-950 h-1.5 rounded mb-1"><div id="barCompHp" class="bg-emerald-500 h-1.5 rounded transition-all duration-300"></div></div>
+                            
+                            <div class="flex justify-between text-[9px] uppercase font-bold text-purple-400 w-full"><span>EN</span> <span id="hudCompSp">0/0</span></div>
+                            <div class="w-full bg-slate-950 h-1.5 rounded"><div id="barCompSp" class="bg-purple-500 h-1.5 rounded transition-all duration-300"></div></div>
                         </div>
                     </div>
                 </div>
-                <div class="text-right w-full md:w-auto bg-slate-900/30 p-2 rounded border border-slate-800 md:border-transparent">
+                
+                <!-- HUD INIMIGO -->
+                <div class="text-right w-full md:w-auto bg-slate-900/30 p-2 rounded border border-slate-800 md:border-transparent relative">
                     <h2 class="font-bold text-xs md:text-sm text-purple-400 tracking-wide truncate" id="hudEnemyName">Inimigo</h2>
-                    <div class="w-32 mt-1 ml-auto">
-                        <div class="flex justify-between text-[9px] uppercase font-bold text-purple-300"><span>HP</span> <span id="hudEnemyHp">80/80</span></div>
+                    <div class="mt-1 ml-auto min-w-[120px]">
+                        <div class="flex justify-between items-center mb-1">
+                            <!-- INDICADOR DE ESCUDO DO INIMIGO -->
+                            <span id="hudEnemyShield" class="text-[10px] font-bold text-blue-300 mr-2 hidden bg-blue-900/50 px-1 rounded">🛡️ 0</span>
+                            <div class="flex justify-between text-[9px] uppercase font-bold text-purple-300 w-full"><span>HP</span> <span id="hudEnemyHp">80/80</span></div>
+                        </div>
                         <div class="w-full bg-slate-950 h-1.5 rounded"><div id="barEnemyHp" class="bg-purple-500 h-1.5 rounded transition-all duration-300"></div></div>
                     </div>
                 </div>
             </header>
 
             <div class="flex-1 bg-slate-900 border border-slate-700 rounded relative flex flex-col p-4 overflow-hidden min-h-[150px]">
-                <div class="absolute top-2 left-2 bg-slate-800 px-2 py-1 rounded text-xs font-mono text-slate-400 border border-slate-700 shadow">Andar: <span id="hudAndar" class="text-white">1</span> | Turno: <span id="turnCounter" class="text-white">1</span> <span id="badgeFaseTurno" class="ml-2 bg-blue-900 px-1 rounded text-white font-bold uppercase text-[10px]"></span></div>
-                <div class="flex-1 flex justify-between items-end px-4 md:px-12 text-5xl md:text-6xl relative pb-4">
+                <div class="absolute top-2 left-2 bg-slate-800 px-2 py-1 rounded text-xs font-mono text-slate-400 border border-slate-700 shadow z-20">
+                    Andar: <span id="hudAndar" class="text-white">1</span> | Turno: <span id="turnCounter" class="text-white">1</span> 
+                    <span id="badgeFaseTurno" class="ml-2 bg-blue-900 px-1 rounded text-white font-bold uppercase text-[10px]"></span>
+                </div>
+                
+                <div class="flex-1 flex justify-between items-end px-4 md:px-12 text-5xl md:text-6xl relative pb-4 pt-8">
                     <div class="flex gap-4 md:gap-8 items-end">
                         <div id="spriteRider" class="transform transition-transform duration-200">⚪</div>
                         <div id="spriteCompanheiro" class="transform transition-transform duration-200 text-4xl hidden opacity-80 mb-2"></div>
                     </div>
-                    <div id="spriteEnemy" class="transform animate-pulse duration-500">🦇</div>
+                    
+                    <!-- ARENA DO INIMIGO (COM INTENÇÃO ACIMA DELE) -->
+                    <div class="relative flex flex-col items-center">
+                        <div id="enemyIntent" class="absolute -top-12 bg-slate-800 border border-slate-600 px-2 py-1 rounded text-[10px] font-mono font-bold shadow-lg opacity-0 transition-opacity whitespace-nowrap z-10 text-center pointer-events-none">
+                            <!-- Injetado via JS -->
+                        </div>
+                        <div id="spriteEnemy" class="transform animate-pulse duration-500 z-0">🦇</div>
+                    </div>
                 </div>
-                <div id="battleLog" class="h-20 md:h-24 w-full bg-slate-800/80 border border-slate-700 rounded p-2 overflow-y-auto log-area font-mono text-[10px] md:text-xs mt-4 shadow-inner shrink-0"></div>
+                
+                <div id="battleLog" class="h-20 md:h-24 w-full bg-slate-800/80 border border-slate-700 rounded p-2 overflow-y-auto log-area font-mono text-[10px] md:text-xs mt-4 shadow-inner shrink-0 z-20"></div>
             </div>
 
             <div class="h-48 md:h-56 flex gap-2 shrink-0">
@@ -249,25 +263,16 @@
     </div>
 
     <script>
-        window.onerror = function(message) { 
-            mostrarToast(`Erro Crítico Localizado. Contate Suporte.`, 'bg-red-600 border-white text-white font-bold'); 
-            return false; 
-        };
-
-        function mostrarToast(mensagem, corClasses = 'bg-slate-800 border-slate-600 text-white') {
-            const container = document.getElementById('toastContainer');
-            if(!container) return;
-            const toast = document.createElement('div');
-            toast.className = `toast-enter p-3 rounded shadow-xl border-l-4 font-mono text-xs md:text-sm ${corClasses}`;
-            toast.innerHTML = mensagem; 
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.replace('toast-enter', 'opacity-0'); toast.style.transition = 'all 0.3s';
-                toast.style.transform = 'translateX(100%)'; setTimeout(() => toast.remove(), 300);
-            }, 3000);
+        window.onerror = function(message) { mostrarToast(`Erro Crítico: ${message}`, 'bg-red-600 border-white text-white font-bold'); return false; };
+        function mostrarToast(msg, css = 'bg-slate-800 border-slate-600 text-white') {
+            const container = document.getElementById('toastContainer'); if(!container) return;
+            const toast = document.createElement('div'); toast.className = `toast-enter p-3 rounded shadow-xl border-l-4 font-mono text-xs md:text-sm ${css}`;
+            toast.innerHTML = msg; container.appendChild(toast);
+            setTimeout(() => { toast.classList.replace('toast-enter', 'opacity-0'); toast.style.transition = 'all 0.3s';
+            toast.style.transform = 'translateX(100%)'; setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
-        // ================= BASE DE DADOS =================
+        // ================= BASE DE DADOS (COM HABILIDADES DE DEFESA) =================
         const DB_RIDERS = {
             kuuga: {
                 id: 'kuuga', name: 'Kamen Rider Kuuga', baseHp: 100, maxEnergy: 10,
@@ -275,12 +280,18 @@
                     growing: {
                         id: 'growing', name: 'Growing Form', sprite: '⚪',
                         ataques: [ { nome: 'Soco Fraco', custo: 2, dano: 5 }, { nome: 'Chute Crescente', custo: 4, dano: 12 } ],
-                        habilidades: [ { nome: 'Foco (+SP)', custo: 0, efeito: 'foco_energia', valor: 4, usoPorTurno: 1 } ]
+                        habilidades: [ 
+                            { nome: 'Foco (+SP)', custo: 0, efeito: 'foco_energia', valor: 4, usoPorTurno: 1 },
+                            { nome: 'Bloqueio Simples', custo: 2, efeito: 'ganhar_escudo', valor: 8, usoPorTurno: 99 }
+                        ]
                     },
                     mighty: {
                         id: 'mighty', name: 'Mighty Form', sprite: '🔴',
                         ataques: [ { nome: 'Mighty Punch', custo: 3, dano: 15 }, { nome: 'Mighty Kick', custo: 8, dano: 35 } ],
-                        habilidades: [ { nome: 'Pose (Buff Atk)', custo: 3, efeito: 'buff_atk', valor: 1.5, usoPorTurno: 1 } ]
+                        habilidades: [ 
+                            { nome: 'Pose (Buff Atk)', custo: 3, efeito: 'buff_atk', valor: 1.5, usoPorTurno: 1 },
+                            { nome: 'Muralha de Chamas', custo: 4, efeito: 'ganhar_escudo', valor: 15, usoPorTurno: 99 }
+                        ]
                     }
                 }
             }
@@ -290,14 +301,13 @@
             { nome: 'Combo Relâmpago', custo: 3, dano: 16, desc: 'Ataque elétrico de alta eficiência.' },
             { nome: 'Chute Giratório', custo: 4, dano: 22, desc: 'Golpe de rotação que desestabiliza o alvo.' },
             { nome: 'Golpe Esmagador', custo: 5, dano: 32, desc: 'Pesado e violento. Destrói defesas.' },
-            { nome: 'Sequência Feroz', custo: 3, dano: 18, desc: 'Série rápida de estocadas frontais.' },
             { nome: 'Impacto Direto', custo: 6, dano: 45, desc: 'Canalização concentrada de energia.' }
         ];
 
         const DB_COMPANHEIROS = {
             kuuga: [
-                { id: 'ichijo', name: 'Inspetor Ichijo', sprite: '👮', hp: 45, maxHp: 45, sp: 6, maxSp: 6, ataques: [ { nome: 'Tiro de Gás', custo: 2, dano: 15 }, { nome: 'Fuzil Sniper', custo: 4, dano: 30 } ], desc: 'Suporte armado da polícia.' },
-                { id: 'gouram', name: 'Gouram', sprite: '🪲', hp: 120, maxHp: 120, sp: 4, maxSp: 4, ataques: [ { nome: 'Investida Metálica', custo: 2, dano: 12 }, { nome: 'Impacto Aéreo', custo: 3, dano: 25 } ], desc: 'Artefato vivo blindado.' }
+                { id: 'ichijo', name: 'Inspetor Ichijo', sprite: '👮', hp: 45, maxHp: 45, sp: 6, maxSp: 6, escudo: 0, ataques: [ { nome: 'Tiro de Gás', custo: 2, dano: 15 }, { nome: 'Cobertura Tática (Escudo)', custo: 3, dano: 0, especial: 'escudo', valor: 12 } ], desc: 'Suporte armado da polícia.' },
+                { id: 'gouram', name: 'Gouram', sprite: '🪲', hp: 120, maxHp: 120, sp: 4, maxSp: 4, escudo: 0, ataques: [ { nome: 'Investida Metálica', custo: 2, dano: 12 }, { nome: 'Couraça (Escudo)', custo: 2, dano: 0, especial: 'escudo', valor: 20 } ], desc: 'Artefato vivo blindado.' }
             ]
         };
 
@@ -305,202 +315,68 @@
         let runState = { andarAtual: 0, mapa: [], moedas: 0, pocaoCount: 1, rider: null, companheiro: null };
         let battleState = { fase: 'jogador', turno: 1, itemUsado: false, habilidadesUsadas: {}, abaAtual: 'ataques', enemy: null };
 
-        const telasDOM = {
-            login: document.getElementById('telaLogin'), menuPrincipal: document.getElementById('telaMenuPrincipal'),
-            lab: document.getElementById('telaLaboratorio'), mapa: document.getElementById('telaMapa'), 
-            batalha: document.getElementById('telaBatalha'), recompensa: document.getElementById('telaRecompensa')
-        };
+        const telasDOM = { login: document.getElementById('telaLogin'), menuPrincipal: document.getElementById('telaMenuPrincipal'), lab: document.getElementById('telaLaboratorio'), mapa: document.getElementById('telaMapa'), batalha: document.getElementById('telaBatalha'), recompensa: document.getElementById('telaRecompensa') };
         function trocarTela(nome) { Object.values(telasDOM).forEach(el => el.classList.add('hidden')); telasDOM[nome].classList.remove('hidden'); }
 
-        // ================= SISTEMA DE LOGIN MOCK =================
-        document.getElementById('formAutenticacao').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const user = document.getElementById('inpUser').value.trim().toLowerCase();
-            const pass = document.getElementById('inpPass').value;
-
-            if (user === 'admin' && pass === '12345') {
-                mostrarToast("Acesso Autorizado.", "bg-emerald-600 text-white border-white");
-                carregarDadosLocais();
-                trocarTela('menuPrincipal');
-            } else {
-                mostrarToast("Credenciais Inválidas! (Use: admin / 12345)", "bg-red-600 text-white border-white");
-            }
-        });
-
-        function carregarDadosLocais() {
-            const saved = localStorage.getItem('kr_admin_meta');
-            if (saved) {
-                metaState = JSON.parse(saved);
-                if (metaState.dificuldade_selecionada === undefined) metaState.dificuldade_selecionada = 0;
-            } else { metaState = { moedas_permanentes: 0, upgrade_vida: 0, upgrade_dano: 0, dificuldade_selecionada: 0 }; }
-            document.getElementById('selectDificuldade').value = metaState.dificuldade_selecionada;
-            atualizarInterfaceLaboratorio();
-        }
-
+        // ================= FLUXOS DE MENUS E MAPAS =================
+        document.getElementById('formAutenticacao').addEventListener('submit', function(e) { e.preventDefault(); const u = document.getElementById('inpUser').value.trim().toLowerCase(); const p = document.getElementById('inpPass').value; if (u === 'admin' && p === '12345') { mostrarToast("Acesso Autorizado.", "bg-emerald-600 border-white"); carregarDadosLocais(); trocarTela('menuPrincipal'); } else { mostrarToast("Credenciais Inválidas!", "bg-red-600 border-white"); }});
+        function carregarDadosLocais() { const saved = localStorage.getItem('kr_admin_meta'); if (saved) { metaState = JSON.parse(saved); if (metaState.dificuldade_selecionada === undefined) metaState.dificuldade_selecionada = 0; } else { metaState = { moedas_permanentes: 0, upgrade_vida: 0, upgrade_dano: 0, dificuldade_selecionada: 0 }; } document.getElementById('selectDificuldade').value = metaState.dificuldade_selecionada; atualizarInterfaceLaboratorio(); }
         function salvarDadosLocais() { localStorage.setItem('kr_admin_meta', JSON.stringify(metaState)); }
         function desconectarTerminal() { document.getElementById('inpUser').value = ''; document.getElementById('inpPass').value = ''; trocarTela('login'); }
         function abrirLaboratorio() { carregarDadosLocais(); trocarTela('lab'); }
         function voltarParaMenuPrincipal() { trocarTela('menuPrincipal'); }
 
-        // ================= LABORATÓRIO =================
-        function atualizarInterfaceLaboratorio() {
-            document.getElementById('labMoedasPermanentes').innerText = metaState.moedas_permanentes;
-            document.getElementById('lvlVida').innerText = `${metaState.upgrade_vida}/5`;
-            const btnVida = document.getElementById('btnUpVida');
-            if(metaState.upgrade_vida >= 5) { btnVida.innerText = "Esgotado"; btnVida.disabled = true; }
-            else { btnVida.innerText = `Calibrar: ${50 * (metaState.upgrade_vida + 1)} 🪙`; btnVida.disabled = false; }
-
-            document.getElementById('lvlDano').innerText = `${metaState.upgrade_dano}/5`;
-            const btnDano = document.getElementById('btnUpDano');
-            if(metaState.upgrade_dano >= 5) { btnDano.innerText = "Esgotado"; btnDano.disabled = true; }
-            else { btnDano.innerText = `Calibrar: ${60 * (metaState.upgrade_dano + 1)} 🪙`; btnDano.disabled = false; }
-        }
-
-        function comprarUpgrade(tipo) {
-            if (tipo === 'vida') {
-                let custo = 50 * (metaState.upgrade_vida + 1);
-                if (metaState.moedas_permanentes >= custo && metaState.upgrade_vida < 5) {
-                    metaState.moedas_permanentes -= custo; metaState.upgrade_vida++;
-                    mostrarToast("HP Máximo calibrado (+15)!", "bg-emerald-600");
-                } else { mostrarToast("Moedas insuficientes!", "bg-yellow-600"); return; }
-            } else if (tipo === 'dano') {
-                let custo = 60 * (metaState.upgrade_dano + 1);
-                if (metaState.moedas_permanentes >= custo && metaState.upgrade_dano < 5) {
-                    metaState.moedas_permanentes -= custo; metaState.upgrade_dano++;
-                    mostrarToast("Dano Básico fortalecido (+4)!", "bg-emerald-600");
-                } else { mostrarToast("Moedas insuficientes!", "bg-yellow-600"); return; }
-            }
-            salvarDadosLocais(); atualizarInterfaceLaboratorio();
-        }
-
+        function atualizarInterfaceLaboratorio() { document.getElementById('labMoedasPermanentes').innerText = metaState.moedas_permanentes; document.getElementById('lvlVida').innerText = `${metaState.upgrade_vida}/5`; const btnVida = document.getElementById('btnUpVida'); if(metaState.upgrade_vida >= 5) { btnVida.innerText = "Esgotado"; btnVida.disabled = true; } else { btnVida.innerText = `Calibrar: ${50 * (metaState.upgrade_vida + 1)} 🪙`; btnVida.disabled = false; } document.getElementById('lvlDano').innerText = `${metaState.upgrade_dano}/5`; const btnDano = document.getElementById('btnUpDano'); if(metaState.upgrade_dano >= 5) { btnDano.innerText = "Esgotado"; btnDano.disabled = true; } else { btnDano.innerText = `Calibrar: ${60 * (metaState.upgrade_dano + 1)} 🪙`; btnDano.disabled = false; } }
+        function comprarUpgrade(tipo) { if (tipo === 'vida') { let custo = 50 * (metaState.upgrade_vida + 1); if (metaState.moedas_permanentes >= custo && metaState.upgrade_vida < 5) { metaState.moedas_permanentes -= custo; metaState.upgrade_vida++; mostrarToast("HP Máximo calibrado (+15)!", "bg-emerald-600"); } else { mostrarToast("Moedas insuficientes!", "bg-yellow-600"); return; } } else if (tipo === 'dano') { let custo = 60 * (metaState.upgrade_dano + 1); if (metaState.moedas_permanentes >= custo && metaState.upgrade_dano < 5) { metaState.moedas_permanentes -= custo; metaState.upgrade_dano++; mostrarToast("Dano Básico fortalecido (+4)!", "bg-emerald-600"); } else { mostrarToast("Moedas insuficientes!", "bg-yellow-600"); return; } } salvarDadosLocais(); atualizarInterfaceLaboratorio(); }
         function alterarDificuldadeVisual() { metaState.dificuldade_selecionada = parseInt(document.getElementById('selectDificuldade').value); salvarDadosLocais(); mostrarToast(`Parâmetros de simulação definidos.`); }
 
-        // ================= LOOP DO MAPA =================
-        function iniciarRun() {
-            runState.moedas = 0; runState.andarAtual = 0; runState.pocaoCount = 1; runState.companheiro = null;
-            runState.rider = JSON.parse(JSON.stringify(DB_RIDERS.kuuga));
-            runState.rider.formaAtual = 'growing';
-            runState.rider.maxHp = runState.rider.baseHp + (metaState.upgrade_vida * 15);
-            runState.rider.hp = runState.rider.maxHp;
-            runState.rider.maxSp = runState.rider.maxEnergy; runState.rider.sp = runState.rider.maxSp; runState.rider.buffAtk = 1;
+        function iniciarRun() { runState.moedas = 0; runState.andarAtual = 0; runState.pocaoCount = 1; runState.companheiro = null; runState.rider = JSON.parse(JSON.stringify(DB_RIDERS.kuuga)); runState.rider.formaAtual = 'growing'; runState.rider.maxHp = runState.rider.baseHp + (metaState.upgrade_vida * 15); runState.rider.hp = runState.rider.maxHp; runState.rider.maxSp = runState.rider.maxEnergy; runState.rider.sp = runState.rider.maxSp; runState.rider.buffAtk = 1; runState.rider.escudo = 0; gerarMapaAleatorio(); renderizarMapa(); trocarTela('mapa'); }
+        function gerarMapaAleatorio() { runState.mapa = []; for (let i = 0; i < 10; i++) { let opcoes = []; let num = (i === 0 || i === 9) ? 1 : Math.floor(Math.random() * 3) + 2; for(let j = 0; j < num; j++) { let tipo = 'batalha'; let icone = '⚔️'; let cor = 'bg-red-900/80 border-red-500 text-red-100'; if (i === 9) { tipo = 'chefe'; icone = '☠️'; cor = 'bg-purple-900/90 border-purple-500 scale-125'; } else if (i > 0 && i < 9) { let r = Math.random(); if (r < 0.25) { tipo = 'descanso'; icone = '⛺'; cor = 'bg-emerald-900/80 border-emerald-500'; } else if (r < 0.45) { tipo = 'loja'; icone = '💰'; cor = 'bg-yellow-900/80 border-yellow-500'; } else if (r < 0.65) { tipo = 'companheiro'; icone = '👥'; cor = 'bg-indigo-900/80 border-indigo-500 text-indigo-200'; } } opcoes.push({ tipo, icone, cor }); } runState.mapa.push(opcoes); } }
+        function renderizarMapa() { const container = document.getElementById('mapContainer'); document.getElementById('hudMoedas').innerText = runState.moedas; container.innerHTML = ''; runState.mapa.forEach((andar, idx) => { const row = document.createElement('div'); row.className = 'flex gap-6 md:gap-8 justify-center w-full relative mb-4'; andar.forEach(no => { const btn = document.createElement('button'); btn.className = `map-node flex items-center justify-center w-12 h-14 md:w-16 md:h-16 rounded-full border-4 text-xl md:text-2xl shadow-lg ${no.cor} `; btn.innerHTML = no.icone; if (idx === runState.andarAtual) { btn.classList.add('active', 'animate-pulse'); btn.onclick = () => entrarNoMapa(no.tipo); } else if (idx < runState.andarAtual) { btn.classList.add('locked', 'border-slate-500', 'bg-slate-800'); btn.innerHTML = '✔️'; } else { btn.classList.add('locked'); } row.appendChild(btn); }); container.appendChild(row); }); setTimeout(() => { const atv = container.querySelector('.map-node.active'); if(atv) atv.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100); }
+        function entrarNoMapa(tipo) { if (tipo === 'batalha' || tipo === 'chefe') { prepararCombate(tipo); trocarTela('batalha'); } else if (tipo === 'descanso') { runState.rider.hp = Math.min(runState.rider.maxHp, runState.rider.hp + 30); if(runState.companheiro) runState.companheiro.hp = Math.min(runState.companheiro.maxHp, runState.companheiro.hp + 30); mostrarToast('Setor Seguro! HP restaurado.', 'border-emerald-500 bg-slate-800 text-emerald-400'); prosseguirMapa(); } else if (tipo === 'companheiro') { if (runState.companheiro) { runState.companheiro.hp = runState.companheiro.maxHp; mostrarToast('Aliado curado em 100%.', 'border-emerald-500 bg-emerald-900 text-white'); prosseguirMapa(); } else { abrirCasaCompanheiros(); } } else { mostrarToast(`Terminal Descriptografado! +20 Moedas.`, 'border-yellow-500 bg-slate-800'); runState.moedas += 20; prosseguirMapa(); } }
+        function prosseguirMapa() { runState.andarAtual++; if (runState.andarAtual >= 10) { mostrarToast("SISTEMA CONCLUÍDO! VITÓRIA!", "border-emerald-500 bg-emerald-900 text-white font-bold text-lg"); finalizarRunGlobal(true); } else { renderizarMapa(); trocarTela('mapa'); } }
+        function finalizarRunGlobal(vitoria) { let multiplicador = 1 + (metaState.dificuldade_selecionada * 0.4); let moedasFinais = Math.floor(runState.moedas * (vitoria ? 1.0 : 0.5) * multiplicador); metaState.moedas_permanentes += moedasFinais; mostrarToast(`Run encerrada. Carregando +${moedasFinais} Moedas Rider.`, "bg-yellow-600 font-bold"); salvarDadosLocais(); carregarDadosLocais(); trocarTela('menuPrincipal'); }
 
-            gerarMapaAleatorio(); renderizarMapa(); trocarTela('mapa');
-        }
+        function abrirCasaCompanheiros() { document.getElementById('txtTituloRecompensa').innerText = "Sinal de Aliado Detectado!"; document.getElementById('txtDescricaoDraft').innerText = "> Escolha 1 suporte tático da sua série:"; const container = document.getElementById('containerCartasDraft'); container.innerHTML = ''; const poolCompativel = DB_COMPANHEIROS[runState.rider.id] || []; poolCompativel.forEach(comp => { const btn = document.createElement('button'); btn.className = 'ff-menu p-4 hover:border-indigo-400 hover:-translate-y-2 transition-transform text-left cursor-pointer flex flex-col h-full'; btn.innerHTML = `<div class="flex justify-between items-start mb-2 border-b border-slate-700 pb-2 w-full"><h3 class="font-bold text-indigo-300 text-sm md:text-base">${comp.name} ${comp.sprite}</h3><span class="text-emerald-400 font-mono text-xs bg-slate-800 px-2 py-0.5 rounded border border-slate-700">HP: ${comp.maxHp}</span></div><div class="text-purple-400 font-mono text-[11px] mb-2 font-bold">Técnicas inclusas:</div><ul class="text-[10px] text-slate-300 list-disc list-inside mb-4 space-y-0.5 flex-1">${comp.ataques.map(a => `<li>${a.nome} (${a.dano > 0 ? a.dano+' Dmg' : a.valor+' Def'} / ${a.custo} SP)</li>`).join('')}</ul><p class="text-[10px] text-slate-400 italic border-t border-slate-800 pt-2">${comp.desc}</p>`; btn.onclick = () => { runState.companheiro = JSON.parse(JSON.stringify(comp)); runState.companheiro.escudo = 0; mostrarToast(`Aliado Conectado!`, "border-indigo-500 bg-indigo-950 text-white"); prosseguirMapa(); }; container.appendChild(btn); }); document.getElementById('btnVoltarDraft').classList.add('hidden'); document.getElementById('recCategorias').classList.add('hidden'); document.getElementById('recDraft').classList.remove('hidden'); trocarTela('recompensa'); }
 
-        function gerarMapaAleatorio() {
-            runState.mapa = [];
-            for (let i = 0; i < 10; i++) {
-                let opcoes = []; let num = (i === 0 || i === 9) ? 1 : Math.floor(Math.random() * 3) + 2; 
-                for(let j = 0; j < num; j++) {
-                    let tipo = 'batalha'; let icone = '⚔️'; let cor = 'bg-red-900/80 border-red-500 text-red-100';
-                    if (i === 9) { tipo = 'chefe'; icone = '☠️'; cor = 'bg-purple-900/90 border-purple-500 scale-125'; }
-                    else if (i > 0 && i < 9) {
-                        let r = Math.random();
-                        if (r < 0.25) { tipo = 'descanso'; icone = '⛺'; cor = 'bg-emerald-900/80 border-emerald-500'; }
-                        else if (r < 0.45) { tipo = 'loja'; icone = '💰'; cor = 'bg-yellow-900/80 border-yellow-500'; }
-                        else if (r < 0.65) { tipo = 'companheiro'; icone = '👥'; cor = 'bg-indigo-900/80 border-indigo-500 text-indigo-200'; }
-                    }
-                    opcoes.push({ tipo, icone, cor });
-                }
-                runState.mapa.push(opcoes);
+        // ================= SISTEMA DE COMBATE E INTENÇÕES =================
+        function log(msg, cor = 'text-slate-300') { const p = document.createElement('p'); p.className = `mb-1 ${cor}`; p.innerText = `> ${msg}`; const bl = document.getElementById('battleLog'); bl.appendChild(p); bl.scrollTop = bl.scrollHeight; }
+
+        function calcularIntencaoInimigo() {
+            // IA do inimigo estilo Slay the Spire: decide ANTES do turno do jogador
+            const int = {};
+            const r = Math.random();
+            if (r < 0.60) {
+                int.tipo = 'ataque';
+                int.valor = battleState.enemy.danoBase + Math.floor(Math.random() * 5);
+                int.icone = `⚔️ ${int.valor}`; int.cor = 'text-red-400';
+            } else if (r < 0.85) {
+                int.tipo = 'defesa';
+                int.valor = 10 + Math.floor(Math.random() * 10);
+                int.icone = `🛡️ ${int.valor}`; int.cor = 'text-blue-400';
+            } else {
+                int.tipo = 'debuff';
+                int.icone = `☣️ Tóxico`; int.cor = 'text-purple-400';
             }
+            battleState.enemy.intencao = int;
+            atualizarIntentBadge();
         }
 
-        function renderizarMapa() {
-            const container = document.getElementById('mapContainer');
-            document.getElementById('hudMoedas').innerText = runState.moedas; container.innerHTML = '';
-            runState.mapa.forEach((andar, idx) => {
-                const row = document.createElement('div'); row.className = 'flex gap-6 md:gap-8 justify-center w-full relative mb-4';
-                andar.forEach(no => {
-                    const btn = document.createElement('button');
-                    btn.className = `map-node flex items-center justify-center w-12 h-14 md:w-16 md:h-16 rounded-full border-4 text-xl md:text-2xl shadow-lg ${no.cor} `;
-                    btn.innerHTML = no.icone;
-                    if (idx === runState.andarAtual) { btn.classList.add('active', 'animate-pulse', 'cursor-pointer'); btn.onclick = () => entrarNoMapa(no.tipo); }
-                    else if (idx < runState.andarAtual) { btn.classList.add('locked', 'border-slate-500', 'bg-slate-800'); btn.innerHTML = '✔️'; }
-                    else { btn.classList.add('locked'); }
-                    row.appendChild(btn);
-                });
-                container.appendChild(row);
-            });
-            setTimeout(() => { const atv = container.querySelector('.map-node.active'); if(atv) atv.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
-        }
-
-        function entrarNoMapa(tipo) {
-            if (tipo === 'batalha' || tipo === 'chefe') { prepararCombate(tipo); trocarTela('batalha'); }
-            else if (tipo === 'descanso') {
-                runState.rider.hp = Math.min(runState.rider.maxHp, runState.rider.hp + 30);
-                if(runState.companheiro) runState.companheiro.hp = Math.min(runState.companheiro.maxHp, runState.companheiro.hp + 30);
-                mostrarToast('Setor Seguro! HP restaurado.', 'border-emerald-500 bg-slate-800 text-emerald-400'); prosseguirMapa();
-            } else if (tipo === 'companheiro') { 
-                if (runState.companheiro) {
-                    runState.companheiro.hp = runState.companheiro.maxHp;
-                    mostrarToast('Frequência ocupada. Aliado curado em 100%.', 'border-emerald-500 bg-emerald-900 text-white');
-                    prosseguirMapa();
-                } else { abrirCasaCompanheiros(); }
+        function atualizarIntentBadge() {
+            const badge = document.getElementById('enemyIntent');
+            if (battleState.fase === 'vitoria' || battleState.fase === 'derrota') { badge.classList.add('opacity-0'); return; }
+            if (battleState.enemy && battleState.enemy.intencao) {
+                badge.innerHTML = `<span class="${battleState.enemy.intencao.cor} drop-shadow-md">${battleState.enemy.intencao.icone}</span>`;
+                badge.classList.remove('opacity-0');
             }
-            else { mostrarToast(`Terminal descriptografado! +20 Moedas.`, 'border-yellow-500 bg-slate-800'); runState.moedas += 20; prosseguirMapa(); }
-        }
-
-        function prosseguirMapa() {
-            runState.andarAtual++;
-            if (runState.andarAtual >= 10) {
-                mostrarToast("SISTEMA CONCLUÍDO! VITÓRIA!", "border-emerald-500 bg-emerald-900 text-white font-bold text-lg");
-                finalizarRunGlobal(true);
-            } else { renderizarMapa(); trocarTela('mapa'); }
-        }
-
-        function finalizarRunGlobal(vitoria) {
-            let multiplicador = 1 + (metaState.dificuldade_selecionada * 0.4);
-            let moedasFinais = Math.floor(runState.moedas * (vitoria ? 1.0 : 0.5) * multiplicador);
-            metaState.moedas_permanentes += moedasFinais;
-            mostrarToast(`Run encerrada. Carregando +${moedasFinais} Moedas Rider.`, "bg-yellow-600 font-bold");
-            salvarDadosLocais(); carregarDadosLocais();
-            trocarTela('menuPrincipal');
-        }
-
-        // ================= COMPANHEIROS =================
-        function abrirCasaCompanheiros() {
-            document.getElementById('txtTituloRecompensa').innerText = "Sinal de Aliado Detectado!";
-            document.getElementById('txtDescricaoDraft').innerText = "> Escolha 1 suporte tático da sua série:";
-            const container = document.getElementById('containerCartasDraft'); container.innerHTML = '';
-            
-            const poolCompativel = DB_COMPANHEIROS[runState.rider.id] || [];
-            poolCompativel.forEach(comp => {
-                const btn = document.createElement('button');
-                btn.className = 'ff-menu p-4 hover:border-indigo-400 hover:-translate-y-2 transition-transform text-left cursor-pointer flex flex-col h-full';
-                btn.innerHTML = `
-                    <div class="flex justify-between items-start mb-2 border-b border-slate-700 pb-2 w-full">
-                        <h3 class="font-bold text-indigo-300 text-sm md:text-base">${comp.name} ${comp.sprite}</h3>
-                        <span class="text-emerald-400 font-mono text-xs bg-slate-800 px-2 py-0.5 rounded border border-slate-700">HP: ${comp.maxHp}</span>
-                    </div>
-                    <div class="text-purple-400 font-mono text-[11px] mb-2 font-bold">Técnicas inclusas:</div>
-                    <ul class="text-[10px] text-slate-300 list-disc list-inside mb-4 space-y-0.5 flex-1">
-                        ${comp.ataques.map(a => `<li>${a.nome} (${a.dano} Dmg / ${a.custo} SP)</li>`).join('')}
-                    </ul>
-                    <p class="text-[10px] text-slate-400 italic border-t border-slate-800 pt-2">${comp.desc}</p>
-                `;
-                btn.onclick = () => {
-                    runState.companheiro = JSON.parse(JSON.stringify(comp));
-                    mostrarToast(`Aliado Conectado!`, "border-indigo-500 bg-indigo-950 text-white");
-                    prosseguirMapa();
-                };
-                container.appendChild(btn);
-            });
-            document.getElementById('btnVoltarDraft').classList.add('hidden');
-            document.getElementById('recCategorias').classList.add('hidden'); document.getElementById('recDraft').classList.remove('hidden');
-            trocarTela('recompensa');
-        }
-
-        // ================= COMBATE =================
-        function log(msg, cor = 'text-slate-300') {
-            const p = document.createElement('p'); p.className = `mb-1 ${cor}`; p.innerText = `> ${msg}`;
-            const bl = document.getElementById('battleLog'); bl.appendChild(p); bl.scrollTop = bl.scrollHeight;
         }
 
         function prepararCombate(tipo) {
             battleState.fase = 'jogador'; battleState.turno = 1; battleState.itemUsado = false; battleState.habilidadesUsadas = {};
             runState.rider.formaAtual = 'growing'; runState.rider.sp = runState.rider.maxSp; runState.rider.buffAtk = 1;
-            if(runState.companheiro) runState.companheiro.sp = runState.companheiro.maxSp;
+            runState.rider.escudo = 0; // Limpa escudos antigos
+            
+            if(runState.companheiro) { runState.companheiro.sp = runState.companheiro.maxSp; runState.companheiro.escudo = 0; }
 
             let difMult = 1 + (metaState.dificuldade_selecionada * 0.4);
             let baseHpInimigo = tipo === 'chefe' ? 160 : 50 + (runState.andarAtual * 6);
@@ -508,20 +384,37 @@
             battleState.enemy = { 
                 name: tipo === 'chefe' ? 'Boss Grongi' : 'Kaijin Shocker', 
                 hp: Math.floor(baseHpInimigo * difMult), maxHp: Math.floor(baseHpInimigo * difMult), 
-                danoBase: Math.floor((tipo === 'chefe' ? 14 : 6) * difMult)
+                danoBase: Math.floor((tipo === 'chefe' ? 14 : 6) * difMult),
+                escudo: 0, intencao: null
             };
             
             document.getElementById('hudAndar').innerText = runState.andarAtual + 1;
-            document.getElementById('battleLog').innerHTML = ''; 
-            log('Conexão estabelecida. Combate ativo.', 'text-emerald-400');
+            document.getElementById('battleLog').innerHTML = ''; log('Conexão estabelecida. Combate ativo.', 'text-emerald-400');
             
             const boxComp = document.getElementById('hudBoxCompanheiro'); const spriteComp = document.getElementById('spriteCompanheiro');
-            if(runState.companheiro) {
-                boxComp.classList.remove('hidden'); spriteComp.classList.remove('hidden');
-                document.getElementById('hudCompName').innerText = runState.companheiro.name;
-                spriteComp.innerText = runState.companheiro.sprite;
-            } else { boxComp.classList.add('hidden'); spriteComp.classList.add('hidden'); }
+            if(runState.companheiro) { boxComp.classList.remove('hidden'); spriteComp.classList.remove('hidden'); document.getElementById('hudCompName').innerText = runState.companheiro.name; spriteComp.innerText = runState.companheiro.sprite; } else { boxComp.classList.add('hidden'); spriteComp.classList.add('hidden'); }
+            
+            calcularIntencaoInimigo(); // GERA A PRIMEIRA INTENÇÃO
             atualizarHUD(); mudarAba('ataques');
+        }
+
+        function aplicarDano(alvoObj, danoCalculado, logMsgSucesso) {
+            // Lógica Global de Escudo (Block) antes de afetar HP
+            if (alvoObj.escudo > 0) {
+                if (danoCalculado >= alvoObj.escudo) {
+                    danoCalculado -= alvoObj.escudo;
+                    log(`O Escudo de ${alvoObj.name || 'Alvo'} foi quebrado!`, 'text-yellow-400');
+                    alvoObj.escudo = 0;
+                } else {
+                    alvoObj.escudo -= danoCalculado;
+                    log(`O Escudo de ${alvoObj.name || 'Alvo'} absorveu totalmente o impacto.`, 'text-blue-300');
+                    danoCalculado = 0;
+                }
+            }
+            if (danoCalculado > 0) {
+                alvoObj.hp -= danoCalculado;
+                log(logMsgSucesso.replace('{DANO}', danoCalculado), 'text-white');
+            }
         }
 
         function atualizarHUD() {
@@ -536,20 +429,31 @@
             document.getElementById('barSp').style.width = `${Math.max(0, (r.sp / r.maxSp) * 100)}%`;
             document.getElementById('barEnemyHp').style.width = `${Math.max(0, (battleState.enemy.hp / battleState.enemy.maxHp) * 100)}%`;
             
+            // HUD Escudo Rider
+            const elRidShield = document.getElementById('hudRiderShield');
+            if(r.escudo > 0) { elRidShield.innerText = `🛡️ ${r.escudo}`; elRidShield.classList.remove('hidden'); } else { elRidShield.classList.add('hidden'); }
+
+            // HUD Escudo Inimigo
+            const elEneShield = document.getElementById('hudEnemyShield');
+            if(battleState.enemy.escudo > 0) { elEneShield.innerText = `🛡️ ${battleState.enemy.escudo}`; elEneShield.classList.remove('hidden'); } else { elEneShield.classList.add('hidden'); }
+
             if(runState.companheiro) {
                 document.getElementById('hudCompHp').innerText = `${Math.max(0, runState.companheiro.hp)}/${runState.companheiro.maxHp}`;
                 document.getElementById('hudCompSp').innerText = `${runState.companheiro.sp}/${runState.companheiro.maxSp}`;
                 document.getElementById('barCompHp').style.width = `${Math.max(0, (runState.companheiro.hp / runState.companheiro.maxHp) * 100)}%`;
                 document.getElementById('barCompSp').style.width = `${Math.max(0, (runState.companheiro.sp / runState.companheiro.maxSp) * 100)}%`;
+                
+                // HUD Escudo Companheiro
+                const elCompShield = document.getElementById('hudCompShield');
+                if(runState.companheiro.escudo > 0) { elCompShield.innerText = `🛡️ ${runState.companheiro.escudo}`; elCompShield.classList.remove('hidden'); } else { elCompShield.classList.add('hidden'); }
             }
 
-            const badge = document.getElementById('badgeFaseTurno');
-            badge.innerText = `Turno: ${battleState.fase}`;
+            const badge = document.getElementById('badgeFaseTurno'); badge.innerText = `Turno: ${battleState.fase}`;
             if(battleState.fase === 'jogador') badge.className = "ml-2 bg-blue-600 px-1 rounded text-white font-bold uppercase text-[10px]";
             else if(battleState.fase === 'companheiro') badge.className = "ml-2 bg-indigo-600 px-1 rounded text-white font-bold uppercase text-[10px]";
             else badge.className = "ml-2 bg-purple-600 px-1 rounded text-white font-bold uppercase text-[10px]";
 
-            const ib = document.getElementById('itemStatus'); ib.innerText = runState.pocaoCount;
+            document.getElementById('itemStatus').innerText = runState.pocaoCount;
         }
 
         function mudarAba(novaAba) {
@@ -559,17 +463,12 @@
             document.querySelectorAll('#colunaAbasEsquerda .ff-btn').forEach(b => b.classList.remove('active'));
             const menuAcoes = document.getElementById('menuAcoes'); menuAcoes.innerHTML = '';
             
-            if (battleState.fase === 'vitoria') {
-                menuAcoes.innerHTML = `<button onclick="vencerCombate()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Acessar Arquivos de Loot</button>`; return;
-            } else if (battleState.fase === 'derrota') {
-                menuAcoes.innerHTML = `<button onclick="finalizarRunGlobal(false)" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Sincronizar Falha e Renascer</button>`; return;
-            } else if (battleState.fase === 'inimigo') {
-                menuAcoes.innerHTML = `<div class="p-4 text-center text-slate-500 font-mono animate-pulse mt-4 uppercase">Aguarde. Turno do Inimigo.</div>`; return;
-            }
+            if (battleState.fase === 'vitoria') { menuAcoes.innerHTML = `<button onclick="irParaTelaRecompensa()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Acessar Arquivos de Loot</button>`; return;
+            } else if (battleState.fase === 'derrota') { menuAcoes.innerHTML = `<button onclick="finalizarRunGlobal(false)" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Sincronizar Falha e Renascer</button>`; return;
+            } else if (battleState.fase === 'inimigo') { menuAcoes.innerHTML = `<div class="p-4 text-center text-slate-500 font-mono animate-pulse mt-4 uppercase">Aguarde. Turno do Inimigo.</div>`; return; }
 
             if (battleState.fase === 'companheiro') {
-                btnHab.disabled = true; btnItem.disabled = true; btnTransf.disabled = true;
-                btnPassar.innerText = "Passar (Aliado)"; btnAtaque.classList.add('active');
+                btnHab.disabled = true; btnItem.disabled = true; btnTransf.disabled = true; btnPassar.innerText = "Passar (Aliado)"; btnAtaque.classList.add('active');
                 menuAcoes.innerHTML = `<div class="text-[11px] font-mono text-indigo-400 mb-2 uppercase font-bold tracking-wider">// Arsenal de: ${runState.companheiro.name}</div>`;
                 runState.companheiro.ataques.forEach(a => { criarSlotAcao(a.nome, a.custo, false, function() { usarAtaqueCompanheiro(a); }, true); });
                 return;
@@ -593,7 +492,7 @@
             if (isAliado) { btn.classList.add('border-l-3', '!border-indigo-500', 'bg-indigo-950/20'); }
             const spAtual = isAliado ? runState.companheiro.sp : runState.rider.sp;
             if (spAtual < custo || travadoForcado) btn.disabled = true;
-            btn.innerHTML = `<span class="truncate pr-2">${isAliado ? '⚔️ ' : ''}${nome}</span> <span class="text-cyan-500 font-bold shrink-0">${custo > 0 ? custo+' SP' : 'Livre'}</span>`;
+            btn.innerHTML = `<span class="truncate pr-2">${isAliado ? '🛡️/⚔️ ' : ''}${nome}</span> <span class="text-cyan-500 font-bold shrink-0">${custo > 0 ? custo+' SP' : 'Livre'}</span>`;
             btn.onclick = function() { if (btn.disabled) return; animarImpacto(isAliado ? 'spriteCompanheiro' : 'spriteRider', 'scale-90'); callbackFn(); };
             document.getElementById('menuAcoes').appendChild(btn); return btn;
         }
@@ -602,22 +501,42 @@
             if (battleState.fase !== 'jogador' || runState.rider.sp < atk.custo) return;
             runState.rider.sp -= atk.custo; 
             const d = Math.floor((atk.dano + (metaState.upgrade_dano * 4)) * runState.rider.buffAtk);
-            battleState.enemy.hp -= d; runState.rider.buffAtk = 1;
-            log(`Rider executou [${atk.nome}] ➔ Causa ${d} de dano.`, 'text-white'); verificarFim();
+            aplicarDano(battleState.enemy, d, `Rider executou [${atk.nome}] ➔ Acerto de {DANO} Dmg!`);
+            runState.rider.buffAtk = 1; verificarFim();
         }
 
         function usarAtaqueCompanheiro(atk) {
             if (battleState.fase !== 'companheiro' || runState.companheiro.sp < atk.custo) return;
-            runState.companheiro.sp -= atk.custo; battleState.enemy.hp -= atk.dano;
-            log(`${runState.companheiro.name} disparou [${atk.nome}] ➔ Causa ${atk.dano} de dano!`, 'text-indigo-200'); verificarFim();
+            runState.companheiro.sp -= atk.custo; 
+            
+            // O companheiro agora suporta habilidades de Escudo!
+            if (atk.especial === 'escudo') {
+                runState.companheiro.escudo += atk.valor;
+                log(`${runState.companheiro.name} ativou [${atk.nome}] ganhando ${atk.valor} de Escudo.`, 'text-blue-300');
+            } else {
+                aplicarDano(battleState.enemy, atk.dano, `${runState.companheiro.name} disparou [${atk.nome}] ➔ Impacto de {DANO} Dmg!`);
+            }
+            verificarFim();
         }
 
         function usarHabilidade(hab) {
             if (battleState.fase !== 'jogador' || runState.rider.sp < hab.custo) return;
             battleState.habilidadesUsadas[hab.nome] = (battleState.habilidadesUsadas[hab.nome] || 0) + 1;
             runState.rider.sp -= hab.custo;
-            if(hab.efeito === 'foco_energia') { runState.rider.sp = Math.min(runState.rider.maxSp, runState.rider.sp + hab.valor); log(`Protocolo Foco: +${hab.valor} SP recarregados.`, 'text-cyan-300'); }
-            else if(hab.efeito === 'buff_atk') { runState.rider.buffAtk = hab.valor; log(`Multiplicador de dano calibrado em x${hab.valor}.`, 'text-orange-300'); }
+            
+            if(hab.efeito === 'foco_energia') { 
+                runState.rider.sp = Math.min(runState.rider.maxSp, runState.rider.sp + hab.valor); 
+                log(`Protocolo Foco: +${hab.valor} SP recarregados.`, 'text-cyan-300'); 
+            }
+            else if(hab.efeito === 'buff_atk') { 
+                runState.rider.buffAtk = hab.valor; 
+                log(`Multiplicador de dano calibrado em x${hab.valor}.`, 'text-orange-300'); 
+            }
+            // NOVA HABILIDADE DE ESCUDO DO KUUGA IMPLEMENTADA!
+            else if(hab.efeito === 'ganhar_escudo') {
+                runState.rider.escudo += hab.valor;
+                log(`Módulo de Defesa Ativo: Ganhos ${hab.valor} pontos de Escudo Térmico.`, 'text-blue-300');
+            }
             verificarFim();
         }
 
@@ -637,24 +556,43 @@
 
         function passarTurno() {
             if (battleState.fase === 'jogador') {
+                runState.rider.escudo = 0; // O Escudo não acumula entre turnos
                 if (runState.companheiro && runState.companheiro.hp > 0) {
                     battleState.fase = 'companheiro'; runState.companheiro.sp = runState.companheiro.maxSp;
                     log(`Turno de suporte: ${runState.companheiro.name}.`, 'text-indigo-400 font-bold');
                     atualizarHUD(); mudarAba('ataques');
                 } else { acionarTurnoInimigo(); }
-            } else if (battleState.fase === 'companheiro') { acionarTurnoInimigo(); }
+            } else if (battleState.fase === 'companheiro') { 
+                runState.companheiro.escudo = 0; 
+                acionarTurnoInimigo(); 
+            }
         }
 
         function acionarTurnoInimigo() {
             log('Iniciando ciclo do Kaijin...', 'text-slate-500'); battleState.fase = 'inimigo'; mudarAba('ataques');
+            document.getElementById('enemyIntent').classList.add('opacity-0'); // Oculta intenção na hora de agir
+            
+            battleState.enemy.escudo = 0; // Inimigo perde escudo acumulado no inicio de sua ação
+
             setTimeout(() => {
                 if(battleState.enemy.hp > 0) {
-                    const d = battleState.enemy.danoBase + Math.floor(Math.random() * 4);
+                    const inten = battleState.enemy.intencao;
                     animarImpacto('spriteEnemy', 'scale-125');
-                    if (runState.companheiro && runState.companheiro.hp > 0 && Math.random() > 0.5) {
-                        runState.companheiro.hp -= d; log(`O Kaijin atacou ${runState.companheiro.name} causando ${d} de dano!`, 'text-red-400');
-                    } else {
-                        runState.rider.hp -= d; log(`O Kaijin atacou você causando ${d} de dano!`, 'text-red-400');
+
+                    // IA LÊ A INTENÇÃO E EXECUTA A AÇÃO CORRETA
+                    if (inten.tipo === 'ataque') {
+                        let d = inten.valor;
+                        if (runState.companheiro && runState.companheiro.hp > 0 && Math.random() > 0.5) {
+                            aplicarDano(runState.companheiro, d, `O Kaijin atacou ${runState.companheiro.name}! Dano de {DANO} vazou o escudo!`);
+                        } else {
+                            aplicarDano(runState.rider, d, `O Kaijin fuzilou você! Sofreu {DANO} de Dano direto!`);
+                        }
+                    } else if (inten.tipo === 'defesa') {
+                        battleState.enemy.escudo += inten.valor;
+                        log(`O Kaijin adotou postura defensiva gerando ${inten.valor} de Carapaça (Block).`, 'text-blue-400 font-bold');
+                    } else if (inten.tipo === 'debuff') {
+                        log(`O Kaijin liberou esporos tóxicos na atmosfera da arena!`, 'text-purple-400 font-bold');
+                        // No futuro: status effect system real
                     }
                 }
                 setTimeout(() => {
@@ -663,6 +601,9 @@
                         battleState.turno++; runState.rider.sp = runState.rider.maxSp; 
                         battleState.itemUsado = false; battleState.habilidadesUsadas = {};
                         battleState.fase = 'jogador'; log(`-- Ciclo de Combate: Turno ${battleState.turno} --`, 'text-emerald-500 mt-2');
+                        
+                        calcularIntencaoInimigo(); // Pensa na ação do próximo turno!
+                        
                         atualizarHUD(); mudarAba(battleState.abaAtual);
                     }
                 }, 1000);
@@ -670,49 +611,35 @@
         }
 
         function verificarFim() {
-            if (battleState.enemy.hp <= 0) { battleState.fase = 'vitoria'; log('CONCLUÍDO: Alvo Neutralizado.', 'text-yellow-400 font-bold text-lg'); } 
-            else if (runState.rider.hp <= 0) { battleState.fase = 'derrota'; log('CRÍTICO: Rider Desconectado.', 'text-red-500 font-bold text-lg'); }
+            if (battleState.enemy.hp <= 0) { battleState.fase = 'vitoria'; atualizarIntentBadge(); log('CONCLUÍDO: Alvo Neutralizado.', 'text-yellow-400 font-bold text-lg'); } 
+            else if (runState.rider.hp <= 0) { battleState.fase = 'derrota'; atualizarIntentBadge(); log('CRÍTICO: Rider Desconectado.', 'text-red-500 font-bold text-lg'); }
             atualizarHUD(); mudarAba(battleState.abaAtual);
         }
 
-        // ================= DRAFT DE CARTAS =================
-        function vencerCombate() {
+        // ================= DRAFT DE RECOMPENSAS E LOOT =================
+        function irParaTelaRecompensa() {
             let multiplicador = 1 + (metaState.dificuldade_selecionada * 0.5);
             const moedasGanhas = Math.floor((12 + Math.floor(Math.random() * 10)) * multiplicador);
             runState.moedas += moedasGanhas;
             mostrarToast(`⚡ Alvo Neutralizado! +${moedasGanhas} Moedas Rider extraídas.`, "border-yellow-500 bg-slate-800 text-yellow-400 font-bold");
             document.getElementById('hudMoedas').innerText = runState.moedas;
 
-            document.getElementById('txtTituloRecompensa').innerText = "Batalha Concluída!";
-            document.getElementById('recCategorias').classList.remove('hidden'); 
-            document.getElementById('recDraft').classList.add('hidden');
+            document.getElementById('txtTituloRecompensa').innerText = "Upgrade de Arquivos";
+            document.getElementById('btnVoltarDraft').classList.add('hidden'); 
+            document.getElementById('recCategorias').classList.add('hidden'); 
+            document.getElementById('recDraft').classList.remove('hidden');
             
+            prepararDraftAtaque();
             trocarTela('recompensa');
         }
 
-        function coletarRecompensaDireta(tipo) {
-            if(tipo === 'maxhp') { runState.rider.maxHp += 15; runState.rider.hp += 15; mostrarToast("Core Expandido: +15 Max HP.", "border-blue-500 bg-blue-900 text-white"); } 
-            else if (tipo === 'item') { runState.pocaoCount++; mostrarToast("Módulo de Cura adicionado.", "border-yellow-500 bg-slate-800 text-yellow-400"); }
-            prosseguirMapa();
-        }
-
-        function adquirirAtaqueDraft(atk, forma) {
-            runState.rider.forms[forma.id].ataques.push(atk);
-            mostrarToast(`Instalado com sucesso: [${atk.nome}] na ${forma.name}!`, "border-emerald-500 bg-emerald-900 text-white");
-            prosseguirMapa();
-        }
+        function adquirirAtaqueDraft(atk, forma) { runState.rider.forms[forma.id].ataques.push(atk); mostrarToast(`Instalado com sucesso: [${atk.nome}] na ${forma.name}!`, "border-emerald-500 bg-emerald-900 text-white"); prosseguirMapa(); }
 
         function prepararDraftAtaque() {
             const formasDisponiveis = Object.values(runState.rider.forms);
             const poolEmbaralhada = [...DB_ATAQUES_POOL].sort(() => 0.5 - Math.random());
             const opcoesDraft = [];
-
-            for(let i=0; i<3; i++) {
-                if(!poolEmbaralhada[i]) break;
-                const formaSorteada = formasDisponiveis[Math.floor(Math.random() * formasDisponiveis.length)];
-                opcoesDraft.push({ ataque: poolEmbaralhada[i], forma: formaSorteada });
-            }
-
+            for(let i=0; i<3; i++) { if(!poolEmbaralhada[i]) break; const formaSorteada = formasDisponiveis[Math.floor(Math.random() * formasDisponiveis.length)]; opcoesDraft.push({ ataque: poolEmbaralhada[i], forma: formaSorteada }); }
             const container = document.getElementById('containerCartasDraft'); container.innerHTML = '';
             document.getElementById('txtDescricaoDraft').innerText = "> Escolha 1 novo ataque descriptografado:";
             
@@ -725,20 +652,12 @@
                         <span class="text-cyan-400 font-bold text-xs bg-slate-800 px-2 py-1 rounded border border-slate-700">${opcao.ataque.custo} SP</span>
                     </div>
                     <div class="text-red-400 font-mono text-xs mb-2 font-bold">Dano Atualizado: ${opcao.ataque.dano} Dmg</div>
-                    <div class="mb-3 inline-block bg-indigo-950 border border-indigo-500 text-indigo-300 font-bold px-2 py-0.5 text-[10px] rounded uppercase tracking-wider">
-                        Destino: ${opcao.forma.name}
-                    </div>
+                    <div class="mb-3 inline-block bg-indigo-950 border border-indigo-500 text-indigo-300 font-bold px-2 py-0.5 text-[10px] rounded uppercase tracking-wider">Destino: ${opcao.forma.name}</div>
                     <p class="text-[10px] md:text-xs text-slate-400 italic mt-auto">${opcao.ataque.desc}</p>
                 `;
-                // RESOLVIDO: O erro que originava o crash ao clicar na recompensa do Draft
-                btn.onclick = function() { adquirirAtaqueDraft(opcao.ataque, opcao.forma); };
-                container.appendChild(btn);
+                btn.onclick = function() { adquirirAtaqueDraft(opcao.ataque, opcao.forma); }; container.appendChild(btn);
             });
-            document.getElementById('btnVoltarDraft').classList.remove('hidden'); 
-            document.getElementById('recCategorias').classList.add('hidden'); 
-            document.getElementById('recDraft').classList.remove('hidden');
         }
-
         function voltarCategorias() { document.getElementById('recDraft').classList.add('hidden'); document.getElementById('recCategorias').classList.remove('hidden'); }
         function animarImpacto(id, classe = 'scale-110') { const el = document.getElementById(id); if(!el) return; el.classList.add(classe); setTimeout(() => el.classList.remove(classe), 150); }
     </script>
