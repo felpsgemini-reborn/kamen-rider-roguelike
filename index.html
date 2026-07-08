@@ -152,7 +152,6 @@
 
         <div id="telaRecompensa" class="hidden flex-1 flex flex-col items-center justify-center p-4 md:p-6 bg-slate-900/95 z-20 absolute inset-0">
             <h2 class="text-2xl md:text-3xl font-black text-yellow-400 mb-2 uppercase text-center" id="txtTituloRecompensa">Batalha Concluída!</h2>
-            
             <div id="recCategorias" class="w-full max-w-3xl flex flex-col items-center">
                 <p class="text-emerald-400 mb-8 font-mono text-sm md:text-base text-center">> Linha de dados aberta. Selecione o carregamento:</p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mb-8">
@@ -174,9 +173,8 @@
                 </div>
                 <button onclick="prosseguirMapa()" class="text-slate-400 hover:text-white px-6 py-2 text-xs font-mono uppercase tracking-widest border-b border-slate-700 hover:border-white transition-colors">Ignorar (Skip)</button>
             </div>
-            
             <div id="recDraft" class="hidden w-full max-w-3xl flex flex-col items-center">
-                <p class="text-emerald-400 mb-8 font-mono text-sm md:text-base text-center" id="txtDescricaoDraft">> Escolha 1 novo ataque descriptografado:</p>
+                <p class="text-emerald-400 mb-8 font-mono text-sm md:text-base text-center" id="txtDescricaoDraft">> Selecione 1 opção estrutural:</p>
                 <div id="containerCartasDraft" class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mb-8"></div>
                 <button onclick="voltarCategorias()" id="btnVoltarDraft" class="text-slate-400 hover:text-white px-6 py-2 text-xs font-mono uppercase tracking-widest border-b border-slate-700 hover:border-white transition-colors">Voltar</button>
             </div>
@@ -252,7 +250,7 @@
 
     <script>
         window.onerror = function(message) { 
-            mostrarToast(`Erro detectado no script local.`, 'bg-red-600 border-white text-white font-bold'); 
+            mostrarToast(`Erro Crítico Localizado. Contate Suporte.`, 'bg-red-600 border-white text-white font-bold'); 
             return false; 
         };
 
@@ -269,7 +267,7 @@
             }, 3000);
         }
 
-        // ================= DATA =================
+        // ================= BASE DE DADOS =================
         const DB_RIDERS = {
             kuuga: {
                 id: 'kuuga', name: 'Kamen Rider Kuuga', baseHp: 100, maxEnergy: 10,
@@ -314,14 +312,14 @@
         };
         function trocarTela(nome) { Object.values(telasDOM).forEach(el => el.classList.add('hidden')); telasDOM[nome].classList.remove('hidden'); }
 
-        // ================= LOGIN MOCK =================
+        // ================= SISTEMA DE LOGIN MOCK =================
         document.getElementById('formAutenticacao').addEventListener('submit', function(e) {
             e.preventDefault();
             const user = document.getElementById('inpUser').value.trim().toLowerCase();
             const pass = document.getElementById('inpPass').value;
 
             if (user === 'admin' && pass === '12345') {
-                mostrarToast("Terminal Conectado.", "bg-emerald-600 text-white border-white");
+                mostrarToast("Acesso Autorizado.", "bg-emerald-600 text-white border-white");
                 carregarDadosLocais();
                 trocarTela('menuPrincipal');
             } else {
@@ -383,7 +381,8 @@
             runState.rider = JSON.parse(JSON.stringify(DB_RIDERS.kuuga));
             runState.rider.formaAtual = 'growing';
             runState.rider.maxHp = runState.rider.baseHp + (metaState.upgrade_vida * 15);
-            runState.rider.hp = runState.rider.maxHp; runState.rider.maxSp = runState.rider.maxEnergy; runState.rider.sp = runState.rider.maxSp; runState.rider.buffAtk = 1;
+            runState.rider.hp = runState.rider.maxHp;
+            runState.rider.maxSp = runState.rider.maxEnergy; runState.rider.sp = runState.rider.maxSp; runState.rider.buffAtk = 1;
 
             gerarMapaAleatorio(); renderizarMapa(); trocarTela('mapa');
         }
@@ -543,6 +542,13 @@
                 document.getElementById('barCompHp').style.width = `${Math.max(0, (runState.companheiro.hp / runState.companheiro.maxHp) * 100)}%`;
                 document.getElementById('barCompSp').style.width = `${Math.max(0, (runState.companheiro.sp / runState.companheiro.maxSp) * 100)}%`;
             }
+
+            const badge = document.getElementById('badgeFaseTurno');
+            badge.innerText = `Turno: ${battleState.fase}`;
+            if(battleState.fase === 'jogador') badge.className = "ml-2 bg-blue-600 px-1 rounded text-white font-bold uppercase text-[10px]";
+            else if(battleState.fase === 'companheiro') badge.className = "ml-2 bg-indigo-600 px-1 rounded text-white font-bold uppercase text-[10px]";
+            else badge.className = "ml-2 bg-purple-600 px-1 rounded text-white font-bold uppercase text-[10px]";
+
             const ib = document.getElementById('itemStatus'); ib.innerText = runState.pocaoCount;
         }
 
@@ -554,11 +560,11 @@
             const menuAcoes = document.getElementById('menuAcoes'); menuAcoes.innerHTML = '';
             
             if (battleState.fase === 'vitoria') {
-                menuAcoes.innerHTML = `<button onclick="vencerCombate()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Acessar Módulo de Loot</button>`; return;
+                menuAcoes.innerHTML = `<button onclick="vencerCombate()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Acessar Arquivos de Loot</button>`; return;
             } else if (battleState.fase === 'derrota') {
                 menuAcoes.innerHTML = `<button onclick="finalizarRunGlobal(false)" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 rounded shadow-lg uppercase tracking-widest mt-4">Sincronizar Falha e Renascer</button>`; return;
             } else if (battleState.fase === 'inimigo') {
-                menuAcoes.innerHTML = `<div class="p-4 text-center text-slate-500 font-mono animate-pulse mt-4 uppercase">Processando inteligência inimiga...</div>`; return;
+                menuAcoes.innerHTML = `<div class="p-4 text-center text-slate-500 font-mono animate-pulse mt-4 uppercase">Aguarde. Turno do Inimigo.</div>`; return;
             }
 
             if (battleState.fase === 'companheiro') {
@@ -600,22 +606,6 @@
             log(`Rider executou [${atk.nome}] ➔ Causa ${d} de dano.`, 'text-white'); verificarFim();
         }
 
-        // FIX FLUXO: vencerCombate() agora abre a tela de CATEGORIAS corretamente!
-        function vencerCombate() {
-            let multiplicador = 1 + (metaState.dificuldade_selecionada * 0.5);
-            const moedasGanhas = Math.floor((12 + Math.floor(Math.random() * 10)) * multiplicador);
-            runState.moedas += moedasGanhas;
-            mostrarToast(`⚡ Alvo Neutralizado! +${moedasGanhas} Moedas Rider extraídas.`, "border-yellow-500 bg-slate-800 text-yellow-400 font-bold");
-            document.getElementById('hudMoedas').innerText = runState.moedas;
-
-            // Restaura o título e exibe os 3 botões (Ataque, Vida, Suprimento)
-            document.getElementById('txtTituloRecompensa').innerText = "Batalha Concluída!";
-            document.getElementById('recCategorias').classList.remove('hidden'); 
-            document.getElementById('recDraft').classList.add('hidden');
-            
-            trocarTela('recompensa');
-        }
-
         function usarAtaqueCompanheiro(atk) {
             if (battleState.fase !== 'companheiro' || runState.companheiro.sp < atk.custo) return;
             runState.companheiro.sp -= atk.custo; battleState.enemy.hp -= atk.dano;
@@ -638,7 +628,6 @@
             log(`Injetado Módulo de Cura ➔ +30 HP restaurados.`, 'text-emerald-300'); verificarFim();
         }
 
-        // FIX TYPO: Corrigido o erro "log::log" que quebrava o Henshin
         function transformar(novaForma) {
             if (battleState.fase !== 'jogador' || runState.rider.sp < 3) return;
             runState.rider.sp -= 3; runState.rider.formaAtual = novaForma;
@@ -646,7 +635,6 @@
             atualizarHUD(); mudarAba('ataques');
         }
 
-        function pasarTurno() { passarTurno(); } // Fallback de segurança
         function passarTurno() {
             if (battleState.fase === 'jogador') {
                 if (runState.companheiro && runState.companheiro.hp > 0) {
@@ -658,8 +646,7 @@
         }
 
         function acionarTurnoInimigo() {
-            log('Iniciando ciclo do Kaijin...', 'text-slate-500'); battleState.fase = 'indigo_fase'; // Temporário para travar abas
-            battleState.fase = 'inimigo'; mudarAba('ataques');
+            log('Iniciando ciclo do Kaijin...', 'text-slate-500'); battleState.fase = 'inimigo'; mudarAba('ataques');
             setTimeout(() => {
                 if(battleState.enemy.hp > 0) {
                     const d = battleState.enemy.danoBase + Math.floor(Math.random() * 4);
@@ -667,7 +654,7 @@
                     if (runState.companheiro && runState.companheiro.hp > 0 && Math.random() > 0.5) {
                         runState.companheiro.hp -= d; log(`O Kaijin atacou ${runState.companheiro.name} causando ${d} de dano!`, 'text-red-400');
                     } else {
-                        runState.rider.hp -= d; log(`O Kaijin atacou seu Rider causando ${d} de dano!`, 'text-red-400');
+                        runState.rider.hp -= d; log(`O Kaijin atacou você causando ${d} de dano!`, 'text-red-400');
                     }
                 }
                 setTimeout(() => {
@@ -676,7 +663,7 @@
                         battleState.turno++; runState.rider.sp = runState.rider.maxSp; 
                         battleState.itemUsado = false; battleState.habilidadesUsadas = {};
                         battleState.fase = 'jogador'; log(`-- Ciclo de Combate: Turno ${battleState.turno} --`, 'text-emerald-500 mt-2');
-                        atualizarHUD(); mudarAba('ataques');
+                        atualizarHUD(); mudarAba(battleState.abaAtual);
                     }
                 }, 1000);
             }, 800);
@@ -688,11 +675,18 @@
             atualizarHUD(); mudarAba(battleState.abaAtual);
         }
 
-        function irParaTelaRecompensa() {
-            document.getElementById('txtTituloRecompensa').innerText = "Upgrade de Arquivos";
-            document.getElementById('btnVoltarDraft').classList.remove('hidden'); 
-            document.getElementById('recCategorias').classList.add('hidden'); 
-            document.getElementById('recDraft').classList.remove('hidden');
+        // ================= DRAFT DE CARTAS =================
+        function vencerCombate() {
+            let multiplicador = 1 + (metaState.dificuldade_selecionada * 0.5);
+            const moedasGanhas = Math.floor((12 + Math.floor(Math.random() * 10)) * multiplicador);
+            runState.moedas += moedasGanhas;
+            mostrarToast(`⚡ Alvo Neutralizado! +${moedasGanhas} Moedas Rider extraídas.`, "border-yellow-500 bg-slate-800 text-yellow-400 font-bold");
+            document.getElementById('hudMoedas').innerText = runState.moedas;
+
+            document.getElementById('txtTituloRecompensa').innerText = "Batalha Concluída!";
+            document.getElementById('recCategorias').classList.remove('hidden'); 
+            document.getElementById('recDraft').classList.add('hidden');
+            
             trocarTela('recompensa');
         }
 
@@ -702,7 +696,12 @@
             prosseguirMapa();
         }
 
-        // FIX GERAL: Vinculado os botões de recompensa ao fluxo correto
+        function adquirirAtaqueDraft(atk, forma) {
+            runState.rider.forms[forma.id].ataques.push(atk);
+            mostrarToast(`Instalado com sucesso: [${atk.nome}] na ${forma.name}!`, "border-emerald-500 bg-emerald-900 text-white");
+            prosseguirMapa();
+        }
+
         function prepararDraftAtaque() {
             const formasDisponiveis = Object.values(runState.rider.forms);
             const poolEmbaralhada = [...DB_ATAQUES_POOL].sort(() => 0.5 - Math.random());
@@ -725,17 +724,19 @@
                         <h3 class="font-bold text-white text-sm md:text-base">${opcao.ataque.nome}</h3>
                         <span class="text-cyan-400 font-bold text-xs bg-slate-800 px-2 py-1 rounded border border-slate-700">${opcao.ataque.custo} SP</span>
                     </div>
-                    <div class="text-red-400 font-mono text-xs mb-2 font-bold">Dano: ${opcao.ataque.dano} Dmg</div>
+                    <div class="text-red-400 font-mono text-xs mb-2 font-bold">Dano Atualizado: ${opcao.ataque.dano} Dmg</div>
                     <div class="mb-3 inline-block bg-indigo-950 border border-indigo-500 text-indigo-300 font-bold px-2 py-0.5 text-[10px] rounded uppercase tracking-wider">
                         Destino: ${opcao.forma.name}
                     </div>
                     <p class="text-[10px] md:text-xs text-slate-400 italic mt-auto">${opcao.ataque.desc}</p>
                 `;
-                // FIX TYPO 2: Alterado de opcao.opcao.ataque para opcao.ataque para evitar crash ao clicar!
+                // RESOLVIDO: O erro que originava o crash ao clicar na recompensa do Draft
                 btn.onclick = function() { adquirirAtaqueDraft(opcao.ataque, opcao.forma); };
                 container.appendChild(btn);
             });
-            irParaTelaRecompensa();
+            document.getElementById('btnVoltarDraft').classList.remove('hidden'); 
+            document.getElementById('recCategorias').classList.add('hidden'); 
+            document.getElementById('recDraft').classList.remove('hidden');
         }
 
         function voltarCategorias() { document.getElementById('recDraft').classList.add('hidden'); document.getElementById('recCategorias').classList.remove('hidden'); }
